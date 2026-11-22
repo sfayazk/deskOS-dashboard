@@ -167,6 +167,34 @@ body.has-wallpaper{background-image:linear-gradient(180deg,rgba(5,9,13,.82),rgba
 .spotify-controls button{background:#101922;color:var(--text);border:1px solid #34424e;border-radius:8px;padding:9px 12px;font-size:10px;font-weight:800}
 .spotify-controls button:hover{border-color:var(--accent);color:var(--accent)}
 .spotify-footnote{font-size:10px;line-height:1.55;color:var(--dim);margin-top:12px}
+
+/* Focus Mode: local countdown, low-write daily statistics. */
+.focus-window{width:min(560px,100%)}
+.focus-panel{display:flex;flex-direction:column;gap:16px}
+.focus-intro{margin:0}
+.focus-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.focus-stat{border:1px solid var(--line);background:#0a1117;border-radius:11px;padding:12px}
+.focus-stat-label{font-size:8px;letter-spacing:1.2px;color:var(--muted);text-transform:uppercase;font-weight:800}
+.focus-stat-value{font-size:22px;font-weight:650;letter-spacing:-.7px;margin-top:5px;color:var(--text);font-variant-numeric:tabular-nums}
+.focus-timer-card{border:1px solid var(--line);background:radial-gradient(ellipse at 50% 0%,var(--accent-soft),transparent 62%),#0a1117;border-radius:16px;padding:22px 16px;text-align:center}
+.focus-mode-label{font-size:9px;font-weight:850;letter-spacing:2px;color:var(--accent)}
+.focus-time{font-size:clamp(54px,12vw,82px);font-weight:250;letter-spacing:-4px;line-height:1.1;margin:13px 0 15px;font-variant-numeric:tabular-nums}
+.focus-progress{height:5px;max-width:330px;margin:0 auto 16px;background:#24303a;border-radius:20px;overflow:hidden}
+.focus-progress-fill{height:100%;width:100%;background:var(--accent);border-radius:20px;transition:width .35s linear}
+.focus-timer-actions{display:flex;justify-content:center;gap:9px;flex-wrap:wrap}
+.focus-timer-actions button{min-width:100px}
+.focus-presets{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.focus-preset{background:#0b1218;color:var(--muted);border:1px solid #34424e;border-radius:8px;padding:8px 12px;font-size:10px;font-weight:800}
+.focus-preset[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.focus-custom{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
+.focus-custom input{width:100px;background:#080e14;color:var(--text);border:1px solid #2c3b48;border-radius:8px;padding:9px 10px;font-size:11px;outline:none}
+.focus-message{min-height:18px;text-align:center;font-size:10px;line-height:1.5;color:var(--muted)}
+.focus-sync-note{font-size:9px;line-height:1.5;color:var(--dim);text-align:center}
+.focus-primary{background:var(--accent);color:#07110b;border:1px solid var(--accent);border-radius:8px;padding:9px 16px;font-size:10px;font-weight:900;letter-spacing:.8px}
+.focus-secondary{background:transparent;color:var(--muted);border:1px solid #34424e;border-radius:8px;padding:9px 14px;font-size:10px;font-weight:850;letter-spacing:.7px}
+.focus-primary:hover{filter:brightness(1.06)}.focus-secondary:hover{color:var(--accent);border-color:var(--accent)}
+@media(max-width:480px){.focus-time{font-size:58px}.focus-timer-card{padding:17px 12px}.focus-stats{gap:7px}.focus-stat{padding:10px}.focus-stat-value{font-size:19px}}
+
 @media(max-width:480px){.theme-grid{grid-template-columns:1fr 1fr}.spotify-client-row{flex-direction:column}.spotify-full-wrap{height:352px;min-height:352px}}
 
 @media(max-width:820px){
@@ -272,6 +300,7 @@ body.has-wallpaper{background-image:linear-gradient(180deg,rgba(5,9,13,.82),rgba
     <button type="button" data-open="tasks"><span class="dock-dot">●</span>TASKS</button>
     <button type="button" data-open="weather"><span class="dock-dot">●</span>WEATHER</button>
     <button type="button" data-open="calendar"><span class="dock-dot">●</span>CALENDAR</button>
+    <button type="button" data-open="focus"><span class="dock-dot">●</span>FOCUS</button>
   </nav>
 </div>
 
@@ -335,6 +364,37 @@ body.has-wallpaper{background-image:linear-gradient(180deg,rgba(5,9,13,.82),rgba
           <a href="https://www.icloud.com/calendar/" target="_blank" rel="noopener noreferrer">OPEN ICLOUD CALENDAR ↗</a>
         </div>
         <div class="panel-footnote">Calendar events are not yet synchronised with DeskOS. We can add a dedicated calendar integration later.</div>
+      </section>
+
+      <section class="panel focus-panel" id="panel-focus" hidden>
+        <p class="panel-intro focus-intro">A distraction-free timer for study and development sessions. The countdown runs on this device; completed focus-session totals sync to your DeskOS account with one small database update per completed session.</p>
+        <div class="focus-stats" aria-live="polite">
+          <div class="focus-stat"><div class="focus-stat-label">Today's focus sessions</div><div class="focus-stat-value" id="focusTodaySessions">0</div></div>
+          <div class="focus-stat"><div class="focus-stat-label">Today's focus time</div><div class="focus-stat-value" id="focusTodayMinutes">0 min</div></div>
+        </div>
+        <div class="focus-timer-card">
+          <div class="focus-mode-label" id="focusModeLabel">FOCUS SESSION</div>
+          <div class="focus-time" id="focusTimeDisplay">25:00</div>
+          <div class="focus-progress" id="focusProgress" role="progressbar" aria-label="Focus timer progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="focus-progress-fill" id="focusProgressFill"></div></div>
+          <div class="focus-timer-actions">
+            <button class="focus-primary" id="focusStartPause" type="button">START</button>
+            <button class="focus-secondary" id="focusReset" type="button">RESET</button>
+          </div>
+        </div>
+        <div>
+          <div class="kicker" style="text-align:center;margin-bottom:9px">Session length</div>
+          <div class="focus-presets">
+            <button class="focus-preset" type="button" data-focus-preset="25" aria-pressed="true">25 / 5 MIN</button>
+            <button class="focus-preset" type="button" data-focus-preset="50" aria-pressed="false">50 / 10 MIN</button>
+          </div>
+          <div class="focus-custom" style="margin-top:10px">
+            <label for="focusCustomMinutes" class="panel-footnote" style="margin:0">Custom focus (1–180 min)</label>
+            <input id="focusCustomMinutes" type="number" min="1" max="180" step="1" inputmode="numeric" placeholder="Minutes">
+            <button class="focus-secondary" id="focusApplyCustom" type="button">APPLY</button>
+          </div>
+        </div>
+        <div class="focus-message" id="focusMessage" role="status" aria-live="polite">Choose a session length and press Start when you're ready.</div>
+        <div class="focus-sync-note" id="focusSyncNote">Session totals are stored on this device until you sign in. Firebase receives only completed-session totals, not timer ticks.</div>
       </section>
 
       <section class="panel" id="panel-appearance" hidden>
@@ -787,6 +847,162 @@ body.has-wallpaper{background-image:linear-gradient(180deg,rgba(5,9,13,.82),rgba
   }
   if(firebaseReady&&auth)auth.onAuthStateChanged(function(user){startAppearanceSync(user);});
 
+  // Focus Mode: timer ticks stay local; Firebase is updated only when a focus session completes.
+  (function(){
+    var display=document.getElementById('focusTimeDisplay');
+    var modeLabel=document.getElementById('focusModeLabel');
+    var startPause=document.getElementById('focusStartPause');
+    var resetButton=document.getElementById('focusReset');
+    var progress=document.getElementById('focusProgress');
+    var progressFill=document.getElementById('focusProgressFill');
+    var message=document.getElementById('focusMessage');
+    var sessionsEl=document.getElementById('focusTodaySessions');
+    var minutesEl=document.getElementById('focusTodayMinutes');
+    var syncNote=document.getElementById('focusSyncNote');
+    var customInput=document.getElementById('focusCustomMinutes');
+    var focusMinutes=25,breakMinutes=5,mode='focus',duration=25*60,remaining=25*60;
+    var running=false,endAt=0,timerId=null;
+    var focusDailyRef=null,focusDailyListener=null,focusDaily={sessions:0,minutes:0};
+    var focusTodayKey=localDateKey();
+    var migrationInFlight='';
+
+    function localDateKey(){
+      var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    }
+    function offlineKey(){return 'deskos-focus-offline-'+localDateKey();}
+    function cacheKey(){return 'deskos-focus-cache-'+localDateKey();}
+    function readSummary(key){
+      try{var v=JSON.parse(localStorage.getItem(key)||'{}');return {sessions:Math.max(0,Number(v.sessions)||0),minutes:Math.max(0,Number(v.minutes)||0)};}catch(e){return {sessions:0,minutes:0};}
+    }
+    function writeSummary(key,value){try{localStorage.setItem(key,JSON.stringify({sessions:Math.max(0,Number(value.sessions)||0),minutes:Math.max(0,Number(value.minutes)||0)}));}catch(e){}}
+    function renderSummary(){
+      sessionsEl.textContent=String(focusDaily.sessions||0);
+      minutesEl.textContent=String(focusDaily.minutes||0)+' min';
+    }
+    function setMessage(text){message.textContent=text||'';}
+    function saveTimerState(){
+      try{localStorage.setItem('deskos-focus-timer-v1',JSON.stringify({focusMinutes:focusMinutes,breakMinutes:breakMinutes,mode:mode,duration:duration,remaining:remaining,running:running,endAt:endAt}));}catch(e){}
+    }
+    function renderTimer(){
+      var seconds=Math.max(0,Math.ceil(remaining));
+      var mm=String(Math.floor(seconds/60)).padStart(2,'0');
+      var ss=String(seconds%60).padStart(2,'0');
+      display.textContent=mm+':'+ss;
+      modeLabel.textContent=mode==='focus'?'FOCUS SESSION':'BREAK TIME';
+      startPause.textContent=running?'PAUSE':'START';
+      var pct=duration>0?Math.min(100,Math.max(0,((duration-seconds)/duration)*100)):0;
+      progressFill.style.width=pct+'%';progress.setAttribute('aria-valuenow',String(Math.round(pct)));
+      document.querySelectorAll('[data-focus-preset]').forEach(function(b){b.setAttribute('aria-pressed',Number(b.getAttribute('data-focus-preset'))===focusMinutes?'true':'false');});
+    }
+    function stopInterval(){if(timerId){clearInterval(timerId);timerId=null;}}
+    function addFocusSession(minutes){
+      minutes=Math.max(1,Math.round(minutes));
+      if(currentUser&&firebaseReady){
+        var ref=firebase.database().ref('users/'+currentUser.uid+'/focus/daily/'+focusTodayKey);
+        ref.transaction(function(current){current=current||{};return {sessions:(Number(current.sessions)||0)+1,minutes:(Number(current.minutes)||0)+minutes};}).then(function(result){
+          var value=result&&result.snapshot&&result.snapshot.val();
+          if(value){focusDaily={sessions:Number(value.sessions)||0,minutes:Number(value.minutes)||0};writeSummary(cacheKey(),focusDaily);renderSummary();}
+          syncNote.textContent='Synced to your DeskOS account. Only completed-session totals are stored.';
+        }).catch(function(){
+          var offline=readSummary(offlineKey());offline.sessions+=1;offline.minutes+=minutes;writeSummary(offlineKey(),offline);focusDaily=offline;renderSummary();
+          syncNote.textContent='Could not reach Firebase. This completed session is saved locally for later.';
+        });
+      }else{
+        var local=readSummary(offlineKey());local.sessions+=1;local.minutes+=minutes;writeSummary(offlineKey(),local);focusDaily=local;renderSummary();
+        syncNote.textContent='Saved on this device. Sign in to sync your session totals.';
+      }
+    }
+    function finishTimer(){
+      stopInterval();running=false;remaining=0;endAt=0;renderTimer();saveTimerState();
+      if(mode==='focus'){
+        addFocusSession(focusMinutes);
+        mode='break';duration=breakMinutes*60;remaining=duration;
+        setMessage('Focus session complete. Take a break, then come back refreshed.');
+      }else{
+        mode='focus';duration=focusMinutes*60;remaining=duration;
+        setMessage('Break complete. Ready for another focus session?');
+      }
+      renderTimer();saveTimerState();
+    }
+    function updateCountdown(){
+      if(!running)return;
+      remaining=Math.max(0,Math.ceil((endAt-Date.now())/1000));
+      if(remaining<=0){finishTimer();return;}
+      renderTimer();
+    }
+    function startTimer(){
+      if(running)return;
+      if(remaining<=0)remaining=duration;
+      running=true;endAt=Date.now()+remaining*1000;
+      stopInterval();timerId=setInterval(updateCountdown,1000);
+      setMessage(mode==='focus'?'Focus is running. Keep distractions away.':'Break is running. Step away for a moment.');
+      renderTimer();saveTimerState();
+    }
+    function pauseTimer(){
+      if(!running)return;
+      remaining=Math.max(0,Math.ceil((endAt-Date.now())/1000));running=false;endAt=0;stopInterval();
+      if(remaining<=0){finishTimer();return;}
+      setMessage('Timer paused. Resume whenever you are ready.');renderTimer();saveTimerState();
+    }
+    function resetTimer(){
+      running=false;endAt=0;stopInterval();remaining=duration;setMessage('Timer reset. Start when you are ready.');renderTimer();saveTimerState();
+    }
+    function applyPreset(mins){
+      focusMinutes=mins;breakMinutes=mins===50?10:5;
+      running=false;endAt=0;stopInterval();mode='focus';duration=focusMinutes*60;remaining=duration;
+      setMessage('Session set to '+focusMinutes+' minutes of focus and '+breakMinutes+' minutes of break.');renderTimer();saveTimerState();
+    }
+    startPause.addEventListener('click',function(){if(running)pauseTimer();else startTimer();});
+    resetButton.addEventListener('click',resetTimer);
+    document.querySelectorAll('[data-focus-preset]').forEach(function(button){button.addEventListener('click',function(){applyPreset(Number(button.getAttribute('data-focus-preset')));});});
+    document.getElementById('focusApplyCustom').addEventListener('click',function(){
+      var value=Math.round(Number(customInput.value));
+      if(!Number.isFinite(value)||value<1||value>180){setMessage('Choose a custom focus duration between 1 and 180 minutes.');return;}
+      focusMinutes=value;breakMinutes=5;running=false;endAt=0;stopInterval();mode='focus';duration=focusMinutes*60;remaining=duration;
+      document.querySelectorAll('[data-focus-preset]').forEach(function(b){b.setAttribute('aria-pressed','false');});
+      setMessage('Custom session set to '+focusMinutes+' minutes with a 5-minute break.');renderTimer();saveTimerState();
+    });
+
+    try{
+      var saved=JSON.parse(localStorage.getItem('deskos-focus-timer-v1')||'null');
+      if(saved&&[25,50].indexOf(Number(saved.focusMinutes))>=0){focusMinutes=Number(saved.focusMinutes);breakMinutes=Number(saved.breakMinutes)|| (focusMinutes===50?10:5);}
+      if(saved&&saved.focusMinutes){focusMinutes=Math.min(180,Math.max(1,Math.round(Number(saved.focusMinutes)||25)));breakMinutes=Math.min(30,Math.max(1,Math.round(Number(saved.breakMinutes)||5)));}
+      if(saved&&['focus','break'].indexOf(saved.mode)>=0){mode=saved.mode;duration=Math.max(60,Number(saved.duration)||focusMinutes*60);remaining=Math.max(0,Number(saved.remaining)||duration);}
+      if(saved&&saved.running&&Number(saved.endAt)>Date.now()){running=true;endAt=Number(saved.endAt);remaining=Math.max(0,Math.ceil((endAt-Date.now())/1000));}
+      else if(saved&&saved.running&&Number(saved.endAt)<=Date.now()){running=true;endAt=Number(saved.endAt);remaining=0;}
+    }catch(e){}
+    focusDaily=readSummary(offlineKey());renderSummary();renderTimer();
+    if(running){timerId=setInterval(updateCountdown,1000);if(remaining<=0)finishTimer();}
+
+    function detachFocusSync(){if(focusDailyRef&&focusDailyListener)focusDailyRef.off('value',focusDailyListener);focusDailyRef=null;focusDailyListener=null;migrationInFlight='';}
+    function startFocusSync(user){
+      detachFocusSync();
+      if(!user){focusDaily=readSummary(offlineKey());if(!focusDaily.sessions&&!focusDaily.minutes)focusDaily=readSummary(cacheKey());renderSummary();syncNote.textContent='Signed out · focus totals are saved locally on this device.';return;}
+      focusTodayKey=localDateKey();
+      focusDailyRef=firebase.database().ref('users/'+user.uid+'/focus/daily/'+focusTodayKey);
+      focusDailyListener=function(snapshot){
+        var cloud=snapshot.val()||{sessions:0,minutes:0};
+        focusDaily={sessions:Number(cloud.sessions)||0,minutes:Number(cloud.minutes)||0};
+        writeSummary(cacheKey(),focusDaily);renderSummary();
+        if(navigator.onLine)syncNote.textContent='Synced across your signed-in DeskOS devices. Timer ticks stay local.';
+      };
+      focusDailyRef.on('value',focusDailyListener,function(){syncNote.textContent='Focus statistics could not sync. Check your connection and database rules.';});
+      var offline=readSummary(offlineKey());var migrationKey='deskos-focus-migrated-'+user.uid+'-'+focusTodayKey;var migrated='';
+      try{migrated=localStorage.getItem(migrationKey)||'';}catch(e){}
+      if((offline.sessions||offline.minutes)&&migrated!=='1'&&migrationInFlight!==migrationKey){
+        migrationInFlight=migrationKey;
+        focusDailyRef.transaction(function(current){current=current||{};return {sessions:(Number(current.sessions)||0)+offline.sessions,minutes:(Number(current.minutes)||0)+offline.minutes};}).then(function(){
+          try{localStorage.setItem(migrationKey,'1');localStorage.removeItem(offlineKey());}catch(e){}
+          migrationInFlight='';
+        }).catch(function(){migrationInFlight='';syncNote.textContent='Offline focus totals are kept on this device; syncing will retry when you reconnect.';});
+      }
+    }
+    if(firebaseReady&&auth)auth.onAuthStateChanged(startFocusSync);
+    window.addEventListener('online',function(){if(currentUser)startFocusSync(currentUser);});
+    window.addEventListener('focus',function(){if(running)updateCountdown();});
+    document.addEventListener('visibilitychange',function(){if(!document.hidden&&running)updateCountdown();});
+  })();
+
   // Spotify Connect uses Spotify OAuth Authorization Code with PKCE; no client secret is stored in the page.
   var spotifyClientInput=document.getElementById('spotifyClientIdInput');
   var spotifyStatusEl=document.getElementById('spotifyConnectStatus');
@@ -896,11 +1112,12 @@ body.has-wallpaper{background-image:linear-gradient(180deg,rgba(5,9,13,.82),rgba
   var overlay=document.getElementById('windowOverlay');
   var title=document.getElementById('windowTitle');
   var closeButton=document.getElementById('closeWindow');
-  var panelTitles={tasks:'Task manager',weather:'Weather details',calendar:'Calendar',account:'DeskOS account',appearance:'Appearance',spotify:'Music station'};
+  var panelTitles={tasks:'Task manager',weather:'Weather details',calendar:'Calendar',focus:'Focus mode',account:'DeskOS account',appearance:'Appearance',spotify:'Music station'};
   function openWindow(name){
     document.querySelectorAll('.panel').forEach(function(panel){panel.hidden=panel.id!=='panel-'+name;});
     title.textContent=panelTitles[name]||'DeskOS';
     document.querySelector('.window').classList.toggle('spotify-window',name==='spotify');
+    document.querySelector('.window').classList.toggle('focus-window',name==='focus');
     overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');
     if(name==='tasks'){setTimeout(function(){document.getElementById('panelTaskInput').focus();},60);}
   }
