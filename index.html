@@ -3,99 +3,273 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#090d12">
+<meta name="theme-color" content="#080b0f">
 <title>DeskOS — Smart Desk Companion</title>
 <style>
-:root{--bg:#090d12;--panel:#111923;--panel2:#0d141d;--line:#243342;--text:#e8f0f6;--muted:#8da1b3;--green:#69f0ae;--cyan:#66d9ef;--amber:#ffc66d}
+:root{
+  color-scheme:dark;
+  --bg:#080b0f;--panel:#10161d;--panel-soft:#0d1319;--line:#26323d;
+  --text:#e8edf2;--muted:#8c9aa7;--dim:#62717f;--accent:#8ee6b2;
+  --accent-soft:rgba(142,230,178,.11);--danger:#e58b8b;
+  --radius:15px;--shadow:0 16px 40px rgba(0,0,0,.28);
+}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 15% 0%,#142431 0%,var(--bg) 55%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;padding:18px}
-main{max-width:1100px;margin:auto}
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
-.brand{font-size:13px;letter-spacing:3px;color:var(--green);font-weight:800}
-.status{font-size:11px;color:var(--muted);letter-spacing:1px}
-.grid{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:13px}
-.card{background:linear-gradient(145deg,rgba(20,31,43,.97),rgba(13,20,29,.97));border:1px solid var(--line);border-radius:15px;padding:17px;box-shadow:0 12px 28px #0004;min-width:0}
-.clock{grid-column:span 2;min-height:205px;display:flex;flex-direction:column;justify-content:center}
-.label{font-size:10px;color:var(--green);letter-spacing:2px;font-weight:800;text-transform:uppercase}
-.time{font-size:clamp(48px,10vw,90px);font-weight:250;letter-spacing:-4px;line-height:1.05;margin:8px 0 4px;font-variant-numeric:tabular-nums}
-.date{color:var(--muted);font-size:15px}
-.weather{min-height:205px}
-.weather-main{font-size:39px;margin:16px 0 2px;font-weight:300}
-.weather-sub{font-size:13px;color:var(--muted)}
-.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
-input,button{font:inherit}
-input{background:#09111a;border:1px solid #2b3d4e;border-radius:8px;color:var(--text);padding:9px 10px;min-width:0}
-button{border:1px solid #315044;background:#10271f;color:var(--green);border-radius:8px;padding:9px 11px;font-size:12px;font-weight:700}
-button:active{opacity:.7}
-.weather-form{display:flex;gap:6px;margin-top:14px}
-.weather-form input{width:100%;font-size:12px}
-.tasks{grid-column:span 2}
-.task-form{display:flex;gap:7px;margin:12px 0}
-.task-form input{flex:1}
-ul{list-style:none;padding:0;margin:0}
-li{display:flex;align-items:center;gap:9px;padding:9px 2px;border-bottom:1px solid #22303d;font-size:13px}
-li:last-child{border:0}
-li span{flex:1;overflow-wrap:anywhere}
-li.done span{text-decoration:line-through;color:#708292}
-li input{accent-color:var(--green)}
-.delete{padding:4px 8px;background:transparent;border-color:#35404b;color:#a9bac7}
-.calendar{min-height:170px}\n.spotify{grid-column:span 3}\n.spotify-note{font-size:12px;color:var(--muted);margin:9px 0 12px}\n.spotify iframe{display:block;border:0;border-radius:12px;background:#111}\n.spotify-open{color:var(--green);font-size:10px;text-decoration:none;letter-spacing:1px;white-space:nowrap}
-.calendar p{font-size:13px;color:var(--muted);line-height:1.5}
-.quick{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
-.quick a{color:var(--cyan);font-size:12px;text-decoration:none;border:1px solid #284452;border-radius:8px;padding:8px 10px}
-.footer{margin-top:13px;color:#64788a;font-size:10px;letter-spacing:1px;text-align:right}
-@media(max-width:650px){body{padding:12px}.grid{grid-template-columns:1fr 1fr}.clock{grid-column:span 2}.weather{grid-column:span 2;min-height:150px}.tasks{grid-column:span 2}.calendar{grid-column:span 2}.spotify{grid-column:span 2}.time{font-size:65px}}
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+body{
+  background:radial-gradient(ellipse at 15% 0%,#17232b 0%,#0b1015 38%,var(--bg) 76%);
+  color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  overscroll-behavior:none;
+}
+button,input{font:inherit}
+button{cursor:pointer}
+.app-shell{
+  width:100%;height:100vh;height:100dvh;min-width:0;min-height:0;
+  padding:clamp(8px,1.25vw,17px);
+  padding-top:max(clamp(8px,1.25vw,17px),env(safe-area-inset-top));
+  padding-bottom:max(clamp(8px,1.25vw,17px),env(safe-area-inset-bottom));
+  display:grid;grid-template-rows:34px minmax(0,1fr) 34px;gap:10px;
+}
+.topbar,.dock{display:flex;align-items:center;justify-content:space-between;min-width:0;gap:12px}
+.brand{font-size:12px;font-weight:850;letter-spacing:2.8px;color:var(--accent);white-space:nowrap}
+.brand-mark{color:#d9f8e5;margin-right:7px}
+.system-status{font-size:9px;letter-spacing:1.25px;color:var(--dim);white-space:nowrap}
+.dashboard{
+  display:grid;grid-template-columns:minmax(178px,.82fr) minmax(245px,1.12fr) minmax(260px,1.16fr);
+  gap:12px;min-width:0;min-height:0;overflow:hidden;
+}
+.left-stack{display:grid;grid-template-rows:minmax(0,1.05fr) minmax(0,.95fr);gap:12px;min-width:0;min-height:0}
+.card{
+  background:linear-gradient(150deg,rgba(19,27,36,.98),rgba(13,19,26,.98));
+  border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+  min-width:0;min-height:0;padding:clamp(11px,1.2vw,17px);overflow:hidden;
+}
+.kicker{font-size:9px;line-height:1.3;letter-spacing:1.8px;text-transform:uppercase;font-weight:800;color:var(--accent)}
+.muted{color:var(--muted)}
+.clock-card{display:flex;flex-direction:column;justify-content:center;position:relative}
+.time{font-size:clamp(37px,5.1vw,76px);font-weight:250;letter-spacing:-3.5px;line-height:1;margin:14px 0 9px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.date{font-size:clamp(10px,1.05vw,14px);line-height:1.45;color:var(--muted)}
+.clock-foot{margin-top:18px;color:var(--dim);font-size:9px;letter-spacing:1.2px}
+.weather-card{display:flex;flex-direction:column;justify-content:space-between;gap:8px}
+.weather-reading{display:flex;align-items:flex-end;gap:9px;margin-top:7px}
+.weather-temp{font-size:clamp(30px,3.4vw,48px);line-height:.95;font-weight:300;letter-spacing:-2px}
+.weather-description{font-size:11px;color:var(--muted);padding-bottom:4px;line-height:1.25}
+.weather-place{font-size:10px;color:var(--dim);margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.small-action,.outline-action,.dock button,.panel-action{
+  background:transparent;color:var(--muted);border:1px solid #34424e;border-radius:8px;
+  padding:7px 10px;font-size:9px;font-weight:750;letter-spacing:.8px;white-space:nowrap;
+}
+.small-action:hover,.outline-action:hover,.dock button:hover,.panel-action:hover{color:var(--accent);border-color:#6cae8a;background:var(--accent-soft)}
+.task-card{display:flex;flex-direction:column;gap:11px}
+.card-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.counter{font-size:9px;color:var(--muted);letter-spacing:.8px;white-space:nowrap}
+.quick-task{display:flex;gap:7px;min-width:0}
+.quick-task input,.panel-form input,.weather-form input{
+  min-width:0;width:100%;background:#080e14;color:var(--text);border:1px solid #2c3b48;
+  border-radius:8px;padding:9px 10px;font-size:11px;outline:none;
+}
+.quick-task input:focus,.panel-form input:focus,.weather-form input:focus{border-color:#6cae8a;box-shadow:0 0 0 2px rgba(142,230,178,.08)}
+.add-button{background:var(--accent-soft);color:var(--accent);border:1px solid #426c56;border-radius:8px;padding:0 12px;font-size:11px;font-weight:850;white-space:nowrap}
+.add-button:active{opacity:.7}
+.preview-list{display:flex;flex-direction:column;gap:0;min-height:0;overflow:hidden;flex:1}
+.task-row{display:flex;align-items:center;gap:9px;min-width:0;padding:10px 2px;border-bottom:1px solid rgba(48,62,75,.62);font-size:12px}
+.task-row:last-child{border-bottom:0}
+.task-check{appearance:none;flex:0 0 15px;width:15px;height:15px;margin:0;border:1px solid #607280;border-radius:4px;background:#0b1117;cursor:pointer;position:relative}
+.task-check:checked{background:var(--accent);border-color:var(--accent)}
+.task-check:checked:after{content:"✓";position:absolute;inset:-1px 0 0;color:#0b1510;text-align:center;font-size:11px;font-weight:900}
+.task-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#dce5eb}
+.task-row.done .task-text{text-decoration:line-through;color:#71818e}
+.delete-task{border:0;background:transparent;color:#72818d;padding:3px 6px;font-size:17px;line-height:1}
+.delete-task:hover{color:var(--danger)}
+.empty-state{margin:auto;text-align:center;color:var(--dim);font-size:11px;line-height:1.6;padding:12px}
+.task-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid rgba(48,62,75,.55);padding-top:9px}
+.task-bottom-note{font-size:9px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.music-card{display:flex;flex-direction:column;gap:9px}
+.music-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.music-subtitle{font-size:10px;color:var(--muted);line-height:1.35}
+.spotify-open{color:var(--accent);font-size:9px;text-decoration:none;letter-spacing:.8px;white-space:nowrap;font-weight:800}
+.spotify-open:hover{text-decoration:underline}
+.spotify-frame-wrap{height:clamp(165px,36vh,345px);min-height:145px;max-height:100%;width:100%;border-radius:12px;overflow:hidden;background:#101010;flex:0 1 auto}
+.spotify-frame-wrap iframe{display:block;width:100%;height:100%;border:0;border-radius:12px;background:#101010}
+.music-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--dim);font-size:9px}
+.dock{justify-content:center}
+.dock button{padding:7px 13px;background:rgba(13,20,27,.72);font-size:9px}
+.dock .dock-dot{color:var(--accent);margin-right:6px}
+/* Secondary windows: these scroll independently; the dashboard itself never scrolls. */
+.window-overlay{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(2,5,8,.78);backdrop-filter:blur(8px)}
+.window-overlay.open{display:flex}
+.window{
+  display:flex;flex-direction:column;width:min(680px,100%);max-height:calc(100dvh - 24px);min-height:0;
+  border:1px solid #354452;border-radius:16px;background:linear-gradient(145deg,#151e27,#0c1218);
+  box-shadow:0 24px 80px rgba(0,0,0,.55);overflow:hidden;
+}
+.window-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 17px;border-bottom:1px solid var(--line);flex:0 0 auto}
+.window-title{font-size:11px;font-weight:850;letter-spacing:1.6px;color:var(--accent);text-transform:uppercase}
+.close-window{border:1px solid #394854;background:transparent;color:var(--muted);border-radius:8px;width:30px;height:30px;font-size:18px;line-height:1}
+.window-body{overflow-y:auto;overscroll-behavior:contain;padding:16px;min-height:0;scrollbar-width:thin;scrollbar-color:#526270 #111820}
+.panel[hidden]{display:none!important}
+.panel-intro{font-size:12px;line-height:1.55;color:var(--muted);margin:0 0 14px}
+.panel-form,.weather-form{display:flex;gap:8px;margin-bottom:13px}
+.panel-form input,.weather-form input{font-size:12px;padding:11px 12px}
+.full-task-list{list-style:none;padding:0;margin:0}
+.full-task-list .task-row{padding:12px 3px;font-size:13px}
+.weather-result{border:1px solid var(--line);background:#0a1117;border-radius:12px;padding:16px;margin:12px 0}
+.weather-result .weather-temp{font-size:48px}
+.calendar-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.calendar-links a{display:flex;align-items:center;justify-content:center;min-height:64px;text-align:center;text-decoration:none;color:var(--text);border:1px solid #34434f;border-radius:10px;background:#0c141b;font-size:11px;font-weight:750;letter-spacing:.5px;padding:10px}
+.calendar-links a:hover{border-color:#6cae8a;color:var(--accent)}
+.panel-footnote{font-size:10px;color:var(--dim);line-height:1.5;margin-top:12px}
+@media(max-width:820px){
+ .app-shell{padding:8px;grid-template-rows:28px minmax(0,1fr) 30px;gap:7px}
+ .dashboard{grid-template-columns:minmax(135px,.78fr) minmax(205px,1.12fr) minmax(210px,1.15fr);gap:8px}
+ .left-stack{gap:8px}.card{border-radius:12px;padding:10px}.time{font-size:clamp(34px,6vw,49px);letter-spacing:-2.2px;margin:10px 0 7px}
+ .clock-foot{margin-top:10px;font-size:8px}.weather-temp{font-size:32px}.weather-description{font-size:9px}
+ .task-card,.music-card{gap:7px}.task-row{padding:8px 1px;font-size:10px}.quick-task input{padding:8px;font-size:10px}.add-button{font-size:10px;padding:0 9px}
+ .spotify-frame-wrap{height:clamp(150px,39vh,250px);min-height:135px}.music-subtitle{font-size:9px}.dock button{padding:6px 10px;font-size:8px}
+}
+@media(max-width:600px){
+ .system-status{display:none}.brand{font-size:10px;letter-spacing:2px}
+ .dashboard{grid-template-columns:minmax(115px,.74fr) minmax(180px,1.1fr) minmax(185px,1.12fr);gap:6px}
+ .left-stack{gap:6px}.card{padding:8px}.kicker{font-size:8px;letter-spacing:1.2px}
+ .date{font-size:9px}.time{font-size:clamp(29px,5.8vw,40px);letter-spacing:-1.7px}
+ .weather-temp{font-size:28px}.small-action,.outline-action{font-size:8px;padding:6px 7px}
+ .counter{font-size:8px}.task-row{gap:6px;font-size:9px}.task-check{width:13px;height:13px;flex-basis:13px}
+ .task-bottom-note{font-size:8px}.spotify-frame-wrap{height:clamp(140px,38vh,220px);min-height:125px}
+ .spotify-open{font-size:8px}.music-foot{font-size:8px}.dock{gap:6px}.dock button{padding:6px 8px;font-size:8px}
+}
+@media(max-height:390px){
+ .app-shell{grid-template-rows:24px minmax(0,1fr) 26px;gap:5px;padding:6px}
+ .dashboard,.left-stack{gap:6px}.card{padding:8px}.time{font-size:clamp(28px,5.2vw,42px);margin:7px 0}.clock-foot{display:none}
+ .weather-place{margin-top:4px}.weather-card{gap:4px}.task-card,.music-card{gap:5px}.task-row{padding:6px 1px}
+ .spotify-frame-wrap{height:clamp(125px,40vh,185px);min-height:115px}.music-subtitle{display:none}
+}
+@media(max-width:480px){
+ /* Portrait fallback: preserve a fixed screen and open one workspace at a time. */
+ .dashboard{grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,.75fr) minmax(0,1.25fr)}
+ .left-stack{grid-column:1;grid-row:1;grid-template-rows:1fr 1fr}
+ .task-card{grid-column:2;grid-row:1 / span 2}
+ .music-card{grid-column:1;grid-row:2}
+ .time{font-size:clamp(24px,8vw,38px)}.spotify-frame-wrap{height:125px;min-height:110px}
+ .dock button{padding:5px 7px;font-size:7px}
+}
 </style>
 </head>
 <body>
-<main>
-<header><div class="brand">◈ DESKOS / DEVELOPER MODE</div><div class="status">SYSTEM ONLINE · PERSONAL DASHBOARD</div></header>
-<section class="grid">
-  <div class="card clock">
-    <div class="label">Local system time</div>
-    <div class="time" id="time">--:--</div>
-    <div class="date" id="date">Loading date…</div>
-  </div>
-  <div class="card weather">
-    <div class="label">Weather monitor</div>
-    <div class="weather-main" id="weatherMain">--°</div>
-    <div class="weather-sub" id="weatherSub">Enter a city to load current weather</div>
-    <form class="weather-form" id="weatherForm">
-      <input id="city" type="text" placeholder="City (e.g. Villupuram)" aria-label="City">
-      <button type="submit">LOAD</button>
-    </form>
-  </div>
-  <div class="card tasks">
-    <div class="row"><div class="label">Task queue</div><div class="status" id="taskCount">0 OPEN</div></div>
-    <form class="task-form" id="taskForm">
-      <input id="taskInput" type="text" placeholder="Add a task…" maxlength="100" aria-label="New task">
-      <button type="submit">+ ADD</button>
-    </form>
-    <ul id="tasks"></ul>
-  </div>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">◈</span>DESKOS <span style="color:#71818e;font-weight:600">/ DEVELOPER MODE</span></div>
+    <div class="system-status">SYSTEM ONLINE&nbsp; · &nbsp;PERSONAL WORKSPACE</div>
+  </header>
 
-  <div class="card spotify">
-    <div class="row">
-      <div class="label">Music station / Spotify</div>
-      <a class="spotify-open" href="https://open.spotify.com/playlist/37i9dQZEVXd3LLf0YFwuxs" target="_blank" rel="noopener">OPEN IN SPOTIFY ↗</a>
+  <main class="dashboard" aria-label="DeskOS dashboard">
+    <section class="left-stack">
+      <article class="card clock-card">
+        <div class="kicker">Local system time</div>
+        <div class="time" id="time">--:--</div>
+        <div class="date" id="date">Loading date…</div>
+        <div class="clock-foot">YOUR DESK · YOUR CONTROL CENTRE</div>
+      </article>
+
+      <article class="card weather-card">
+        <div>
+          <div class="kicker">Weather monitor</div>
+          <div class="weather-reading">
+            <div class="weather-temp" id="weatherMain">--°</div>
+            <div class="weather-description" id="weatherShort">Set your city<br>to see conditions</div>
+          </div>
+          <div class="weather-place" id="weatherPlace">LOCATION NOT SET</div>
+        </div>
+        <button class="small-action" type="button" data-open="weather">WEATHER DETAILS ↗</button>
+      </article>
+    </section>
+
+    <section class="card task-card">
+      <div class="card-heading">
+        <div class="kicker">Task queue</div>
+        <div class="counter" id="taskCount">0 OPEN</div>
+      </div>
+      <form class="quick-task" id="quickTaskForm">
+        <input id="quickTaskInput" type="text" placeholder="Add a task…" maxlength="100" aria-label="Add a task">
+        <button class="add-button" type="submit">+</button>
+      </form>
+      <div class="preview-list" id="taskPreview" aria-live="polite"></div>
+      <div class="task-bottom">
+        <span class="task-bottom-note" id="taskSummary">Your next actions at a glance</span>
+        <button class="outline-action" type="button" data-open="tasks">ALL TASKS ↗</button>
+      </div>
+    </section>
+
+    <section class="card music-card">
+      <div class="music-heading">
+        <div class="kicker">Music station</div>
+        <a class="spotify-open" href="https://open.spotify.com/playlist/6zxUmMeCZCIXabCkpZ4IxF" target="_blank" rel="noopener noreferrer">OPEN APP ↗</a>
+      </div>
+      <div class="music-subtitle">Your playlist · Browse tracks inside this player</div>
+      <div class="spotify-frame-wrap">
+        <iframe
+          title="Spotify playlist player"
+          src="https://open.spotify.com/embed/playlist/6zxUmMeCZCIXabCkpZ4IxF?utm_source=generator&theme=0"
+          width="100%" height="352" frameborder="0" allowfullscreen=""
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"></iframe>
+      </div>
+      <div class="music-foot"><span>SPOTIFY PLAYER</span><span>SCROLL TRACKS INSIDE ↕</span></div>
+    </section>
+  </main>
+
+  <nav class="dock" aria-label="DeskOS tools">
+    <button type="button" data-open="tasks"><span class="dock-dot">●</span>TASKS</button>
+    <button type="button" data-open="weather"><span class="dock-dot">●</span>WEATHER</button>
+    <button type="button" data-open="calendar"><span class="dock-dot">●</span>CALENDAR</button>
+  </nav>
+</div>
+
+<div class="window-overlay" id="windowOverlay" aria-hidden="true">
+  <section class="window" role="dialog" aria-modal="true" aria-labelledby="windowTitle">
+    <header class="window-header">
+      <div class="window-title" id="windowTitle">DeskOS</div>
+      <button class="close-window" id="closeWindow" type="button" aria-label="Close window">×</button>
+    </header>
+    <div class="window-body">
+      <section class="panel" id="panel-tasks" hidden>
+        <p class="panel-intro">Your complete task list. Add, complete or remove tasks here. The dashboard preview updates immediately.</p>
+        <form class="panel-form" id="panelTaskForm">
+          <input id="panelTaskInput" type="text" placeholder="What needs to get done?" maxlength="100" aria-label="New task">
+          <button class="add-button" type="submit">ADD TASK</button>
+        </form>
+        <ul class="full-task-list" id="allTasks"></ul>
+      </section>
+
+      <section class="panel" id="panel-weather" hidden>
+        <p class="panel-intro">Choose a city to view current conditions. Your selected city is remembered on this device.</p>
+        <form class="weather-form" id="weatherForm">
+          <input id="city" type="text" placeholder="City (e.g. Villupuram)" aria-label="City">
+          <button class="add-button" type="submit">UPDATE</button>
+        </form>
+        <div class="weather-result">
+          <div class="kicker">Current conditions</div>
+          <div class="weather-reading"><div class="weather-temp" id="weatherDetailTemp">--°C</div><div class="weather-description" id="weatherDetailText">Enter a city to load weather</div></div>
+          <div class="weather-place" id="weatherDetailPlace">LOCATION NOT SET</div>
+        </div>
+        <div class="panel-footnote">Weather data is provided by Open-Meteo. An internet connection is required.</div>
+      </section>
+
+      <section class="panel" id="panel-calendar" hidden>
+        <p class="panel-intro">Open your calendar in the app or web service you already use.</p>
+        <div class="calendar-links">
+          <a href="calshow:">OPEN DEVICE CALENDAR ↗</a>
+          <a href="https://www.icloud.com/calendar/" target="_blank" rel="noopener noreferrer">OPEN ICLOUD CALENDAR ↗</a>
+        </div>
+        <div class="panel-footnote">Calendar events are not yet synchronised with DeskOS. We can add a dedicated calendar integration later.</div>
+      </section>
     </div>
-    <p class="spotify-note">Your selected playlist. Sign in to Spotify in the player if prompted.</p>
-    <<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6zxUmMeCZCIXabCkpZ4IxF?utm_source=generator&si=889f308c663f4a40" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-  </div>
-  <div class="card calendar">
-    <div class="label">Schedule</div>
-    <p>Keep your day organized. Open the iPhone Calendar app to check classes, exams and reminders.</p>
-    <div class="quick">
-      <a href="calshow:">OPEN CALENDAR ↗</a>
-      <a href="https://www.icloud.com/calendar/" target="_blank" rel="noopener">iCLOUD CALENDAR ↗</a>
-    </div>
-  </div>
-</section>
-<div class="footer">DESKOS // BUILT FOR YOUR WORKSPACE</div>
-</main>
+  </section>
+</div>
+
 <script>
 (function(){
-  var timeEl=document.getElementById('time'),dateEl=document.getElementById('date');
+  'use strict';
+  var timeEl=document.getElementById('time');
+  var dateEl=document.getElementById('date');
   function tick(){
     var now=new Date();
     timeEl.textContent=now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:true});
@@ -103,51 +277,102 @@ li input{accent-color:var(--green)}
   }
   tick();setInterval(tick,1000);
 
-  var taskForm=document.getElementById('taskForm'),taskInput=document.getElementById('taskInput'),taskList=document.getElementById('tasks'),taskCount=document.getElementById('taskCount');
+  // Tasks remain local to this browser for now. Firebase will make them shared between devices later.
   var tasks=[];
   try{tasks=JSON.parse(localStorage.getItem('deskos-tasks')||'[]');if(!Array.isArray(tasks))tasks=[];}catch(e){tasks=[];}
-  function save(){try{localStorage.setItem('deskos-tasks',JSON.stringify(tasks));}catch(e){}}
-  function render(){
-    taskList.innerHTML='';
-    tasks.forEach(function(task,index){
-      var li=document.createElement('li');if(task.done)li.className='done';
-      var check=document.createElement('input');check.type='checkbox';check.checked=!!task.done;check.setAttribute('aria-label','Mark task complete');
-      check.addEventListener('change',function(){tasks[index].done=check.checked;save();render();});
-      var span=document.createElement('span');span.textContent=task.text;
-      var del=document.createElement('button');del.className='delete';del.textContent='×';del.setAttribute('aria-label','Delete task');
-      del.addEventListener('click',function(){tasks.splice(index,1);save();render();});
-      li.appendChild(check);li.appendChild(span);li.appendChild(del);taskList.appendChild(li);
-    });
-    var open=tasks.filter(function(t){return !t.done;}).length;
-    taskCount.textContent=open+' OPEN';
+  var preview=document.getElementById('taskPreview');
+  var allTasks=document.getElementById('allTasks');
+  var taskCount=document.getElementById('taskCount');
+  var taskSummary=document.getElementById('taskSummary');
+  function saveTasks(){try{localStorage.setItem('deskos-tasks',JSON.stringify(tasks));}catch(e){}}
+  function makeTaskRow(task,index){
+    var li=document.createElement('li');li.className='task-row'+(task.done?' done':'');
+    var check=document.createElement('input');check.type='checkbox';check.className='task-check';check.checked=!!task.done;check.setAttribute('aria-label','Mark task complete');
+    check.addEventListener('change',function(){tasks[index].done=check.checked;saveTasks();renderTasks();});
+    var span=document.createElement('span');span.className='task-text';span.textContent=task.text||'Untitled task';
+    var del=document.createElement('button');del.type='button';del.className='delete-task';del.textContent='×';del.setAttribute('aria-label','Delete task');
+    del.addEventListener('click',function(){tasks.splice(index,1);saveTasks();renderTasks();});
+    li.appendChild(check);li.appendChild(span);li.appendChild(del);return li;
   }
-  taskForm.addEventListener('submit',function(e){e.preventDefault();var value=taskInput.value.trim();if(!value)return;tasks.unshift({text:value,done:false});taskInput.value='';save();render();});
-  render();
+  function renderTasks(){
+    preview.innerHTML='';allTasks.innerHTML='';
+    var openTasks=tasks.filter(function(t){return !t.done;});
+    var doneTasks=tasks.filter(function(t){return !!t.done;});
+    taskCount.textContent=openTasks.length+' OPEN';
+    taskSummary.textContent=tasks.length?doneTasks.length+' completed · '+tasks.length+' total':'Your next actions at a glance';
+    if(!openTasks.length){
+      var empty=document.createElement('div');empty.className='empty-state';
+      empty.textContent=tasks.length?'All caught up. Nice work.':'No tasks yet. Add one above to get started.';preview.appendChild(empty);
+    }else{
+      openTasks.slice(0,3).forEach(function(task){preview.appendChild(makeTaskRow(task,tasks.indexOf(task)));});
+      if(openTasks.length>3){var more=document.createElement('div');more.className='task-bottom-note';more.style.padding='7px 2px';more.textContent='+'+(openTasks.length-3)+' more in your task list';preview.appendChild(more);}
+    }
+    if(!tasks.length){var emptyAll=document.createElement('li');emptyAll.className='empty-state';emptyAll.textContent='No tasks yet. Add your first task above.';allTasks.appendChild(emptyAll);}
+    else{
+      // Open tasks first, then completed tasks.
+      tasks.map(function(t,i){return {task:t,index:i};}).sort(function(a,b){return Number(!!a.task.done)-Number(!!b.task.done);}).forEach(function(item){allTasks.appendChild(makeTaskRow(item.task,item.index));});
+    }
+  }
+  function addTask(input){var value=input.value.trim();if(!value)return;tasks.unshift({text:value,done:false});input.value='';saveTasks();renderTasks();}
+  document.getElementById('quickTaskForm').addEventListener('submit',function(e){e.preventDefault();addTask(document.getElementById('quickTaskInput'));});
+  document.getElementById('panelTaskForm').addEventListener('submit',function(e){e.preventDefault();addTask(document.getElementById('panelTaskInput'));});
+  renderTasks();
 
-  var weatherMain=document.getElementById('weatherMain'),weatherSub=document.getElementById('weatherSub'),cityInput=document.getElementById('city');
+  // Weather lookup using Open-Meteo geocoding and forecast APIs.
+  var weatherMain=document.getElementById('weatherMain');
+  var weatherShort=document.getElementById('weatherShort');
+  var weatherPlace=document.getElementById('weatherPlace');
+  var weatherDetailTemp=document.getElementById('weatherDetailTemp');
+  var weatherDetailText=document.getElementById('weatherDetailText');
+  var weatherDetailPlace=document.getElementById('weatherDetailPlace');
+  var cityInput=document.getElementById('city');
   var savedCity='';try{savedCity=localStorage.getItem('deskos-city')||'';}catch(e){}
   cityInput.value=savedCity;
   var codes={0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'Rime fog',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',71:'Light snow',73:'Snow',75:'Heavy snow',80:'Rain showers',81:'Rain showers',82:'Heavy showers',95:'Thunderstorm'};
+  function setWeatherLoading(message){weatherShort.textContent=message;weatherDetailText.textContent=message;}
   function loadWeather(city){
     if(!city)return;
-    weatherSub.textContent='Connecting to weather service…';
+    setWeatherLoading('Loading…');
     fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(city)+'&count=1&language=en&format=json')
-    .then(function(r){return r.json();})
+    .then(function(r){if(!r.ok)throw new Error('Geocoding failed');return r.json();})
     .then(function(g){
       if(!g.results||!g.results.length)throw new Error('City not found');
       var p=g.results[0];
-      return fetch('https://api.open-meteo.com/v1/forecast?latitude='+p.latitude+'&longitude='+p.longitude+'&current=temperature_2m,apparent_temperature,weather_code&temperature_unit=celsius').then(function(r){return r.json();}).then(function(w){return {place:p,weather:w};});
+      return fetch('https://api.open-meteo.com/v1/forecast?latitude='+p.latitude+'&longitude='+p.longitude+'&current=temperature_2m,apparent_temperature,weather_code&temperature_unit=celsius')
+      .then(function(r){if(!r.ok)throw new Error('Forecast failed');return r.json();})
+      .then(function(w){return {place:p,weather:w};});
     })
     .then(function(data){
-      var c=data.weather.current,place=data.place;
-      weatherMain.textContent=Math.round(c.temperature_2m)+'°C';
-      weatherSub.textContent=(codes[c.weather_code]||'Current conditions')+' · Feels like '+Math.round(c.apparent_temperature)+'°C · '+place.name;
+      var c=data.weather.current,place=data.place,description=codes[c.weather_code]||'Current conditions';
+      var temp=Math.round(c.temperature_2m)+'°C';
+      weatherMain.textContent=temp;weatherShort.textContent=description;
+      weatherPlace.textContent=place.name+(place.country_code?' · '+place.country_code:'');
+      weatherDetailTemp.textContent=temp;
+      weatherDetailText.textContent=description+' · Feels like '+Math.round(c.apparent_temperature)+'°C';
+      weatherDetailPlace.textContent=place.name+(place.admin1?', '+place.admin1:'')+(place.country?', '+place.country:'');
       try{localStorage.setItem('deskos-city',city);}catch(e){}
     })
-    .catch(function(){weatherSub.textContent='Could not load weather. Check the city and Wi-Fi.';});
+    .catch(function(){setWeatherLoading('Could not load weather');weatherPlace.textContent='CHECK CITY / WI-FI';weatherDetailPlace.textContent='Could not find that city. Check the spelling and connection.';});
   }
   document.getElementById('weatherForm').addEventListener('submit',function(e){e.preventDefault();loadWeather(cityInput.value.trim());});
   if(savedCity)loadWeather(savedCity);
+
+  // Small utility windows: only the selected panel is shown; scroll stays inside the window.
+  var overlay=document.getElementById('windowOverlay');
+  var title=document.getElementById('windowTitle');
+  var closeButton=document.getElementById('closeWindow');
+  var panelTitles={tasks:'Task manager',weather:'Weather details',calendar:'Calendar'};
+  function openWindow(name){
+    document.querySelectorAll('.panel').forEach(function(panel){panel.hidden=panel.id!=='panel-'+name;});
+    title.textContent=panelTitles[name]||'DeskOS';
+    overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');
+    if(name==='tasks'){setTimeout(function(){document.getElementById('panelTaskInput').focus();},60);}
+  }
+  function closeWindow(){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}
+  document.querySelectorAll('[data-open]').forEach(function(button){button.addEventListener('click',function(){openWindow(button.getAttribute('data-open'));});});
+  closeButton.addEventListener('click',closeWindow);
+  overlay.addEventListener('click',function(e){if(e.target===overlay)closeWindow();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&overlay.classList.contains('open'))closeWindow();});
 })();
 </script>
 </body>
