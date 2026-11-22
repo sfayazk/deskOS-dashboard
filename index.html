@@ -257,7 +257,7 @@ button{cursor:pointer}
       </section>
 
       <section class="panel" id="panel-weather" hidden>
-        <p class="panel-intro">Choose a city to view current conditions. Your selected city is remembered on this device.</p>
+        <p class="panel-intro">Choose a city to view current conditions. When signed in, your selected city syncs across your devices; while signed out, it is saved only on this device.</p>
         <form class="weather-form" id="weatherForm">
           <input id="city" type="text" placeholder="City (e.g. Villupuram)" aria-label="City">
           <button class="add-button" type="submit">UPDATE</button>
@@ -271,7 +271,7 @@ button{cursor:pointer}
       </section>
 
       <section class="panel" id="panel-account" hidden>
-        <p class="panel-intro">Sign in with the same DeskOS account on your PC and iPhone. Your tasks will then stay synchronised between both devices.</p>
+        <p class="panel-intro">Sign in with the same DeskOS account on your PC and iPhone. Your tasks and selected weather city stay synchronised between both devices.</p>
         <div id="accountSignedOut">
           <div class="auth-fields">
             <input id="accountEmail" type="email" placeholder="Email address" autocomplete="username" aria-label="Email address">
@@ -546,9 +546,12 @@ button{cursor:pointer}
   var cityInput=document.getElementById('city');
   var savedCity='';try{savedCity=localStorage.getItem('deskos-city')||'';}catch(e){}
   cityInput.value=savedCity;
+  var weatherCityRef=null,weatherCityListener=null,lastLoadedCity='';
   var codes={0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'Rime fog',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',71:'Light snow',73:'Snow',75:'Heavy snow',80:'Rain showers',81:'Rain showers',82:'Heavy showers',95:'Thunderstorm'};
   function setWeatherLoading(message){weatherShort.textContent=message;weatherDetailText.textContent=message;}
-  function loadWeather(city){
+  function loadWeather(city,syncCloud){
+    if(!city)return;
+    city=String(city).trim();
     if(!city)return;
     setWeatherLoading('Loading…');
     fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(city)+'&count=1&language=en&format=json')
@@ -568,12 +571,51 @@ button{cursor:pointer}
       weatherDetailTemp.textContent=temp;
       weatherDetailText.textContent=description+' · Feels like '+Math.round(c.apparent_temperature)+'°C';
       weatherDetailPlace.textContent=place.name+(place.admin1?', '+place.admin1:'')+(place.country?', '+place.country:'');
+      savedCity=city;lastLoadedCity=city.toLowerCase();cityInput.value=city;
       try{localStorage.setItem('deskos-city',city);}catch(e){}
+      // Only a deliberate city change writes to Firebase; remote updates never echo back.
+      if(syncCloud&&currentUser&&weatherCityRef){
+        weatherCityRef.set(city).catch(function(error){showAuthMessage('Weather city could not sync: '+firebaseErrorMessage(error),'error');});
+      }
     })
     .catch(function(){setWeatherLoading('Could not load weather');weatherPlace.textContent='CHECK CITY / WI-FI';weatherDetailPlace.textContent='Could not find that city. Check the spelling and connection.';});
   }
-  document.getElementById('weatherForm').addEventListener('submit',function(e){e.preventDefault();loadWeather(cityInput.value.trim());});
-  if(savedCity)loadWeather(savedCity);
+  function detachWeatherSync(){
+    if(weatherCityRef&&weatherCityListener)weatherCityRef.off('value',weatherCityListener);
+    weatherCityRef=null;weatherCityListener=null;
+  }
+  function startWeatherSync(user){
+    detachWeatherSync();
+    if(!user)return;
+    weatherCityRef=firebase.database().ref('users/'+user.uid+'/settings/weatherCity');
+    weatherCityListener=function(snapshot){
+      var cloudCity=snapshot.val();
+      if(typeof cloudCity==='string'&&cloudCity.trim()){
+        cloudCity=cloudCity.trim();
+        cityInput.value=cloudCity;
+        if(cloudCity.toLowerCase()!==lastLoadedCity)loadWeather(cloudCity,false);
+      }else{
+        // Seed the shared preference once from this device, without overwriting a value another device saved first.
+        var localCity=(savedCity||cityInput.value||'').trim();
+        if(localCity){
+          weatherCityRef.transaction(function(current){
+            return (typeof current==='string'&&current.trim())?current:localCity;
+          });
+        }
+      }
+    };
+    weatherCityRef.on('value',weatherCityListener,function(error){
+      showAuthMessage('Weather sync unavailable: '+firebaseErrorMessage(error),'error');
+    });
+  }
+  document.getElementById('weatherForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var city=cityInput.value.trim();
+    if(city)loadWeather(city,true);
+  });
+  if(savedCity)loadWeather(savedCity,false);
+  // Keep the selected city in the same private per-user branch as tasks.
+  if(firebaseReady&&auth)auth.onAuthStateChanged(function(user){startWeatherSync(user);});
 
   // Small utility windows: only the selected panel is shown; scroll stays inside the window.
   var overlay=document.getElementById('windowOverlay');
