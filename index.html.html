@@ -39,12 +39,12 @@ li span{flex:1;overflow-wrap:anywhere}
 li.done span{text-decoration:line-through;color:#708292}
 li input{accent-color:var(--green)}
 .delete{padding:4px 8px;background:transparent;border-color:#35404b;color:#a9bac7}
-.calendar{min-height:170px}
+.calendar{min-height:170px}\n.spotify{grid-column:span 3}\n.spotify-note{font-size:12px;color:var(--muted);margin:9px 0 12px}\n.spotify iframe{display:block;border:0;border-radius:12px;background:#111}\n.spotify-open{color:var(--green);font-size:10px;text-decoration:none;letter-spacing:1px;white-space:nowrap}
 .calendar p{font-size:13px;color:var(--muted);line-height:1.5}
 .quick{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
 .quick a{color:var(--cyan);font-size:12px;text-decoration:none;border:1px solid #284452;border-radius:8px;padding:8px 10px}
 .footer{margin-top:13px;color:#64788a;font-size:10px;letter-spacing:1px;text-align:right}
-@media(max-width:650px){body{padding:12px}.grid{grid-template-columns:1fr 1fr}.clock{grid-column:span 2}.weather{grid-column:span 2;min-height:150px}.tasks{grid-column:span 2}.calendar{grid-column:span 2}.time{font-size:65px}}
+@media(max-width:650px){body{padding:12px}.grid{grid-template-columns:1fr 1fr}.clock{grid-column:span 2}.weather{grid-column:span 2;min-height:150px}.tasks{grid-column:span 2}.calendar{grid-column:span 2}.spotify{grid-column:span 2}.time{font-size:65px}}
 </style>
 </head>
 <body>
@@ -72,6 +72,24 @@ li input{accent-color:var(--green)}
       <button type="submit">+ ADD</button>
     </form>
     <ul id="tasks"></ul>
+  </div>
+
+  <div class="card spotify">
+    <div class="row">
+      <div class="label">Music station / Spotify</div>
+      <a class="spotify-open" href="https://open.spotify.com/playlist/37i9dQZEVXd3LLf0YFwuxs" target="_blank" rel="noopener">OPEN IN SPOTIFY ↗</a>
+    </div>
+    <p class="spotify-note">Your selected playlist. Sign in to Spotify in the player if prompted.</p>
+    <iframe
+      title="Spotify playlist player"
+      src="https://open.spotify.com/embed/playlist/37i9dQZEVXd3LLf0YFwuxs?utm_source=generator&theme=0"
+      width="100%"
+      height="352"
+      frameborder="0"
+      allowfullscreen=""
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+      loading="lazy">
+    </iframe>
   </div>
   <div class="card calendar">
     <div class="label">Schedule</div>
