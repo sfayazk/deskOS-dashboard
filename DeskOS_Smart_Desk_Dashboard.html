@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090d12">
+<title>DeskOS — Smart Desk Companion</title>
+<style>
+:root{--bg:#090d12;--panel:#111923;--panel2:#0d141d;--line:#243342;--text:#e8f0f6;--muted:#8da1b3;--green:#69f0ae;--cyan:#66d9ef;--amber:#ffc66d}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 15% 0%,#142431 0%,var(--bg) 55%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;padding:18px}
+main{max-width:1100px;margin:auto}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
+.brand{font-size:13px;letter-spacing:3px;color:var(--green);font-weight:800}
+.status{font-size:11px;color:var(--muted);letter-spacing:1px}
+.grid{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:13px}
+.card{background:linear-gradient(145deg,rgba(20,31,43,.97),rgba(13,20,29,.97));border:1px solid var(--line);border-radius:15px;padding:17px;box-shadow:0 12px 28px #0004;min-width:0}
+.clock{grid-column:span 2;min-height:205px;display:flex;flex-direction:column;justify-content:center}
+.label{font-size:10px;color:var(--green);letter-spacing:2px;font-weight:800;text-transform:uppercase}
+.time{font-size:clamp(48px,10vw,90px);font-weight:250;letter-spacing:-4px;line-height:1.05;margin:8px 0 4px;font-variant-numeric:tabular-nums}
+.date{color:var(--muted);font-size:15px}
+.weather{min-height:205px}
+.weather-main{font-size:39px;margin:16px 0 2px;font-weight:300}
+.weather-sub{font-size:13px;color:var(--muted)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+input,button{font:inherit}
+input{background:#09111a;border:1px solid #2b3d4e;border-radius:8px;color:var(--text);padding:9px 10px;min-width:0}
+button{border:1px solid #315044;background:#10271f;color:var(--green);border-radius:8px;padding:9px 11px;font-size:12px;font-weight:700}
+button:active{opacity:.7}
+.weather-form{display:flex;gap:6px;margin-top:14px}
+.weather-form input{width:100%;font-size:12px}
+.tasks{grid-column:span 2}
+.task-form{display:flex;gap:7px;margin:12px 0}
+.task-form input{flex:1}
+ul{list-style:none;padding:0;margin:0}
+li{display:flex;align-items:center;gap:9px;padding:9px 2px;border-bottom:1px solid #22303d;font-size:13px}
+li:last-child{border:0}
+li span{flex:1;overflow-wrap:anywhere}
+li.done span{text-decoration:line-through;color:#708292}
+li input{accent-color:var(--green)}
+.delete{padding:4px 8px;background:transparent;border-color:#35404b;color:#a9bac7}
+.calendar{min-height:170px}
+.calendar p{font-size:13px;color:var(--muted);line-height:1.5}
+.quick{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
+.quick a{color:var(--cyan);font-size:12px;text-decoration:none;border:1px solid #284452;border-radius:8px;padding:8px 10px}
+.footer{margin-top:13px;color:#64788a;font-size:10px;letter-spacing:1px;text-align:right}
+@media(max-width:650px){body{padding:12px}.grid{grid-template-columns:1fr 1fr}.clock{grid-column:span 2}.weather{grid-column:span 2;min-height:150px}.tasks{grid-column:span 2}.calendar{grid-column:span 2}.time{font-size:65px}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="brand">◈ DESKOS / DEVELOPER MODE</div><div class="status">SYSTEM ONLINE · PERSONAL DASHBOARD</div></header>
+<section class="grid">
+  <div class="card clock">
+    <div class="label">Local system time</div>
+    <div class="time" id="time">--:--</div>
+    <div class="date" id="date">Loading date…</div>
+  </div>
+  <div class="card weather">
+    <div class="label">Weather monitor</div>
+    <div class="weather-main" id="weatherMain">--°</div>
+    <div class="weather-sub" id="weatherSub">Enter a city to load current weather</div>
+    <form class="weather-form" id="weatherForm">
+      <input id="city" type="text" placeholder="City (e.g. Villupuram)" aria-label="City">
+      <button type="submit">LOAD</button>
+    </form>
+  </div>
+  <div class="card tasks">
+    <div class="row"><div class="label">Task queue</div><div class="status" id="taskCount">0 OPEN</div></div>
+    <form class="task-form" id="taskForm">
+      <input id="taskInput" type="text" placeholder="Add a task…" maxlength="100" aria-label="New task">
+      <button type="submit">+ ADD</button>
+    </form>
+    <ul id="tasks"></ul>
+  </div>
+  <div class="card calendar">
+    <div class="label">Schedule</div>
+    <p>Keep your day organized. Open the iPhone Calendar app to check classes, exams and reminders.</p>
+    <div class="quick">
+      <a href="calshow:">OPEN CALENDAR ↗</a>
+      <a href="https://www.icloud.com/calendar/" target="_blank" rel="noopener">iCLOUD CALENDAR ↗</a>
+    </div>
+  </div>
+</section>
+<div class="footer">DESKOS // BUILT FOR YOUR WORKSPACE</div>
+</main>
+<script>
+(function(){
+  var timeEl=document.getElementById('time'),dateEl=document.getElementById('date');
+  function tick(){
+    var now=new Date();
+    timeEl.textContent=now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:true});
+    dateEl.textContent=now.toLocaleDateString([], {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  }
+  tick();setInterval(tick,1000);
+
+  var taskForm=document.getElementById('taskForm'),taskInput=document.getElementById('taskInput'),taskList=document.getElementById('tasks'),taskCount=document.getElementById('taskCount');
+  var tasks=[];
+  try{tasks=JSON.parse(localStorage.getItem('deskos-tasks')||'[]');if(!Array.isArray(tasks))tasks=[];}catch(e){tasks=[];}
+  function save(){try{localStorage.setItem('deskos-tasks',JSON.stringify(tasks));}catch(e){}}
+  function render(){
+    taskList.innerHTML='';
+    tasks.forEach(function(task,index){
+      var li=document.createElement('li');if(task.done)li.className='done';
+      var check=document.createElement('input');check.type='checkbox';check.checked=!!task.done;check.setAttribute('aria-label','Mark task complete');
+      check.addEventListener('change',function(){tasks[index].done=check.checked;save();render();});
+      var span=document.createElement('span');span.textContent=task.text;
+      var del=document.createElement('button');del.className='delete';del.textContent='×';del.setAttribute('aria-label','Delete task');
+      del.addEventListener('click',function(){tasks.splice(index,1);save();render();});
+      li.appendChild(check);li.appendChild(span);li.appendChild(del);taskList.appendChild(li);
+    });
+    var open=tasks.filter(function(t){return !t.done;}).length;
+    taskCount.textContent=open+' OPEN';
+  }
+  taskForm.addEventListener('submit',function(e){e.preventDefault();var value=taskInput.value.trim();if(!value)return;tasks.unshift({text:value,done:false});taskInput.value='';save();render();});
+  render();
+
+  var weatherMain=document.getElementById('weatherMain'),weatherSub=document.getElementById('weatherSub'),cityInput=document.getElementById('city');
+  var savedCity='';try{savedCity=localStorage.getItem('deskos-city')||'';}catch(e){}
+  cityInput.value=savedCity;
+  var codes={0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'Rime fog',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',71:'Light snow',73:'Snow',75:'Heavy snow',80:'Rain showers',81:'Rain showers',82:'Heavy showers',95:'Thunderstorm'};
+  function loadWeather(city){
+    if(!city)return;
+    weatherSub.textContent='Connecting to weather service…';
+    fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(city)+'&count=1&language=en&format=json')
+    .then(function(r){return r.json();})
+    .then(function(g){
+      if(!g.results||!g.results.length)throw new Error('City not found');
+      var p=g.results[0];
+      return fetch('https://api.open-meteo.com/v1/forecast?latitude='+p.latitude+'&longitude='+p.longitude+'&current=temperature_2m,apparent_temperature,weather_code&temperature_unit=celsius').then(function(r){return r.json();}).then(function(w){return {place:p,weather:w};});
+    })
+    .then(function(data){
+      var c=data.weather.current,place=data.place;
+      weatherMain.textContent=Math.round(c.temperature_2m)+'°C';
+      weatherSub.textContent=(codes[c.weather_code]||'Current conditions')+' · Feels like '+Math.round(c.apparent_temperature)+'°C · '+place.name;
+      try{localStorage.setItem('deskos-city',city);}catch(e){}
+    })
+    .catch(function(){weatherSub.textContent='Could not load weather. Check the city and Wi-Fi.';});
+  }
+  document.getElementById('weatherForm').addEventListener('submit',function(e){e.preventDefault();loadWeather(cityInput.value.trim());});
+  if(savedCity)loadWeather(savedCity);
+})();
+</script>
+</body>
+</html>
