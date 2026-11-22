@@ -11,12 +11,12 @@
   --bg:#080b0f;--panel:#10161d;--panel-soft:#0d1319;--line:#26323d;
   --text:#e8edf2;--muted:#8c9aa7;--dim:#62717f;--accent:#8ee6b2;
   --accent-soft:rgba(142,230,178,.11);--danger:#e58b8b;
-  --radius:15px;--shadow:0 16px 40px rgba(0,0,0,.28);
+  --radius:15px;--shadow:0 16px 40px rgba(0,0,0,.28);--card-gradient:linear-gradient(150deg,rgba(19,27,36,.98),rgba(13,19,26,.98));
 }
 *{box-sizing:border-box}
 html,body{width:100%;height:100%;margin:0;overflow:hidden}
 body{
-  background:radial-gradient(ellipse at 15% 0%,#17232b 0%,#0b1015 38%,var(--bg) 76%);
+  background:radial-gradient(ellipse at 15% 0%,#17232b 0%,#0b1015 38%,var(--bg) 76%);background-attachment:fixed;
   color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   overscroll-behavior:none;
 }
@@ -39,7 +39,7 @@ button{cursor:pointer}
 }
 .left-stack{display:grid;grid-template-rows:minmax(0,1.05fr) minmax(0,.95fr);gap:12px;min-width:0;min-height:0}
 .card{
-  background:linear-gradient(150deg,rgba(19,27,36,.98),rgba(13,19,26,.98));
+  background:var(--card-gradient);
   border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
   min-width:0;min-height:0;padding:clamp(11px,1.2vw,17px);overflow:hidden;
 }
@@ -131,6 +131,44 @@ button{cursor:pointer}
 .auth-message{font-size:11px;line-height:1.5;color:var(--muted);margin:12px 0 0;min-height:17px}
 .auth-message.error{color:var(--danger)}
 .auth-message.success{color:var(--accent)}
+
+/* DeskOS themes: restrained dark palettes with readable contrast. */
+body[data-theme="ocean"]{--bg:#07131a;--panel:#0d1c25;--panel-soft:#0a1720;--line:#29404c;--accent:#86d8e8;--accent-soft:rgba(134,216,232,.12);--danger:#e58b8b;--card-gradient:linear-gradient(150deg,rgba(15,35,45,.98),rgba(9,22,30,.98))}
+body[data-theme="forest"]{--bg:#0a120e;--panel:#111d16;--panel-soft:#0d1711;--line:#304639;--accent:#a6dfa0;--accent-soft:rgba(166,223,160,.12);--danger:#e58b8b;--card-gradient:linear-gradient(150deg,rgba(21,38,27,.98),rgba(12,23,16,.98))}
+body[data-theme="amber"]{--bg:#15100a;--panel:#21180f;--panel-soft:#19130c;--line:#51402b;--accent:#e8bf7b;--accent-soft:rgba(232,191,123,.12);--danger:#e58b8b;--card-gradient:linear-gradient(150deg,rgba(42,31,19,.98),rgba(23,17,11,.98))}
+body[data-theme="mono"]{--bg:#090909;--panel:#141414;--panel-soft:#101010;--line:#383838;--accent:#e6e6e6;--accent-soft:rgba(230,230,230,.10);--danger:#e58b8b;--card-gradient:linear-gradient(150deg,rgba(28,28,28,.99),rgba(15,15,15,.99))}
+body.has-wallpaper{background-image:linear-gradient(180deg,rgba(5,9,13,.82),rgba(5,9,13,.91)),var(--deskos-wallpaper);background-size:cover;background-position:center;background-repeat:no-repeat;background-attachment:fixed}
+.style-toggle{background:transparent;color:var(--muted);border:1px solid #34424e;border-radius:8px;padding:7px 10px;font-size:9px;font-weight:850;letter-spacing:.8px;white-space:nowrap}
+.style-toggle:hover{color:var(--accent);border-color:var(--accent)}
+.theme-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.theme-choice{display:flex;align-items:center;gap:10px;min-width:0;padding:11px;border:1px solid #34424e;border-radius:11px;background:#0a1117;color:var(--text);text-align:left}
+.theme-choice[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent-soft) inset}
+.theme-swatch{width:38px;height:38px;flex:0 0 38px;border-radius:9px;border:1px solid rgba(255,255,255,.17)}
+.theme-name{font-size:11px;font-weight:800;letter-spacing:.4px}.theme-desc{font-size:9px;color:var(--muted);margin-top:3px}
+.appearance-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.file-picker{display:none}
+.appearance-status,.spotify-connect-status{font-size:10px;line-height:1.5;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}
+.spotify-frame-wrap{height:152px;min-height:152px;max-height:152px;width:100%;border-radius:12px;overflow:hidden;background:#101010;flex:0 0 152px}
+.spotify-frame-wrap iframe{display:block;width:100%;height:152px;border:0;border-radius:12px;background:#101010}
+.spotify-card-action{width:100%;padding:8px 10px;background:rgba(13,20,27,.72);color:var(--accent);border:1px solid #426c56;border-radius:8px;font-size:9px;font-weight:850;letter-spacing:.8px}
+.spotify-card-action:hover{border-color:var(--accent);background:var(--accent-soft)}
+.window.spotify-window{width:min(760px,100%)}
+.spotify-full-wrap{width:100%;height:352px;min-height:352px;overflow:hidden;border-radius:12px;background:#101010}
+.spotify-full-wrap iframe{display:block;width:100%;height:352px;border:0;border-radius:12px;background:#101010}
+.spotify-connect-box{border:1px solid var(--line);background:rgba(7,13,18,.75);border-radius:12px;padding:13px;margin-top:14px}
+.spotify-client-row{display:flex;gap:8px;margin:10px 0}
+.spotify-client-row input{min-width:0;flex:1;background:#080e14;color:var(--text);border:1px solid #2c3b48;border-radius:8px;padding:10px;font-size:11px}
+.redirect-uri{font-size:10px;color:var(--muted);overflow-wrap:anywhere;padding:9px;border:1px dashed #3d4b56;border-radius:8px;background:#080e14;user-select:all}
+.spotify-track-state{display:flex;gap:11px;align-items:center;margin-top:12px;min-width:0}
+.spotify-track-state img{width:64px;height:64px;object-fit:cover;border-radius:8px;background:#18212a;flex:0 0 64px}
+.spotify-track-meta{min-width:0;flex:1}.spotify-track-title{font-size:13px;font-weight:800;overflow-wrap:anywhere}.spotify-track-artist{font-size:10px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}
+.spotify-track-device{font-size:9px;color:var(--accent);margin-top:5px}
+.spotify-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.spotify-controls button{background:#101922;color:var(--text);border:1px solid #34424e;border-radius:8px;padding:9px 12px;font-size:10px;font-weight:800}
+.spotify-controls button:hover{border-color:var(--accent);color:var(--accent)}
+.spotify-footnote{font-size:10px;line-height:1.55;color:var(--dim);margin-top:12px}
+@media(max-width:480px){.theme-grid{grid-template-columns:1fr 1fr}.spotify-client-row{flex-direction:column}.spotify-full-wrap{height:352px;min-height:352px}}
+
 @media(max-width:820px){
  .app-shell{padding:8px;grid-template-rows:28px minmax(0,1fr) 30px;gap:7px}
  .dashboard{grid-template-columns:minmax(135px,.78fr) minmax(205px,1.12fr) minmax(210px,1.15fr);gap:8px}
@@ -140,7 +178,7 @@ button{cursor:pointer}
  .spotify-frame-wrap{height:clamp(150px,39vh,250px);min-height:135px}.music-subtitle{font-size:9px}.dock button{padding:6px 10px;font-size:8px}
 }
 @media(max-width:600px){
- .system-status{display:none}.brand{font-size:10px;letter-spacing:2px}.topbar-tools{gap:5px}.account-toggle{padding:6px 8px;font-size:8px}
+ .system-status{display:none}.style-toggle{padding:6px 7px;font-size:8px}.brand{font-size:10px;letter-spacing:2px}.topbar-tools{gap:5px}.account-toggle{padding:6px 8px;font-size:8px}
  .dashboard{grid-template-columns:minmax(115px,.74fr) minmax(180px,1.1fr) minmax(185px,1.12fr);gap:6px}
  .left-stack{gap:6px}.card{padding:8px}.kicker{font-size:8px;letter-spacing:1.2px}
  .date{font-size:9px}.time{font-size:clamp(29px,5.8vw,40px);letter-spacing:-1.7px}
@@ -167,12 +205,13 @@ button{cursor:pointer}
 }
 </style>
 </head>
-<body>
+<body data-theme="carbon">
 <div class="app-shell">
   <header class="topbar">
     <div class="brand"><span class="brand-mark">◈</span>DESKOS <span style="color:#71818e;font-weight:600">/ DEVELOPER MODE</span></div>
     <div class="topbar-tools">
       <div class="system-status" id="syncStatus" aria-live="polite">LOCAL MODE · CONNECT TO SYNC</div>
+      <button class="style-toggle" type="button" data-open="appearance">STYLE</button>
       <button class="account-toggle" type="button" data-open="account" id="accountToggle">CONNECT ↗</button>
     </div>
   </header>
@@ -220,16 +259,12 @@ button{cursor:pointer}
         <div class="kicker">Music station</div>
         <a class="spotify-open" href="https://open.spotify.com/playlist/6zxUmMeCZCIXabCkpZ4IxF" target="_blank" rel="noopener noreferrer">OPEN APP ↗</a>
       </div>
-      <div class="music-subtitle">Your playlist · Browse tracks inside this player</div>
+      <div class="music-subtitle" id="spotifyDashboardStatus">Playlist preview · Open the full player to browse tracks</div>
       <div class="spotify-frame-wrap">
-        <iframe
-          title="Spotify playlist player"
-          src="https://open.spotify.com/embed/playlist/6zxUmMeCZCIXabCkpZ4IxF?utm_source=generator&theme=0"
-          width="100%" height="352" frameborder="0" allowfullscreen=""
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy"></iframe>
+        <iframe title="Spotify playlist mini player" src="https://open.spotify.com/embed/playlist/6zxUmMeCZCIXabCkpZ4IxF?utm_source=generator&si=889f308c663f4a40" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
       </div>
-      <div class="music-foot"><span>SPOTIFY PLAYER</span><span>SCROLL TRACKS INSIDE ↕</span></div>
+      <button class="spotify-card-action" type="button" data-open="spotify">BROWSE PLAYLIST · CONNECT SPOTIFY ↗</button>
+      <div class="music-foot"><span>SPOTIFY</span><a class="spotify-open" href="https://open.spotify.com/playlist/6zxUmMeCZCIXabCkpZ4IxF" target="_blank" rel="noopener noreferrer">OPEN APP ↗</a></div>
     </section>
   </main>
 
@@ -300,6 +335,60 @@ button{cursor:pointer}
           <a href="https://www.icloud.com/calendar/" target="_blank" rel="noopener noreferrer">OPEN ICLOUD CALENDAR ↗</a>
         </div>
         <div class="panel-footnote">Calendar events are not yet synchronised with DeskOS. We can add a dedicated calendar integration later.</div>
+      </section>
+
+      <section class="panel" id="panel-appearance" hidden>
+        <p class="panel-intro">Choose a built-in DeskOS palette or use your own photo as the background. The selected theme and a compressed custom wallpaper sync through your DeskOS Firebase account; without sign-in they stay on this device.</p>
+        <div class="kicker" style="margin-bottom:10px">Built-in themes</div>
+        <div class="theme-grid" id="themeGrid">
+          <button class="theme-choice" type="button" data-theme-choice="carbon" aria-pressed="true"><span class="theme-swatch" style="background:linear-gradient(135deg,#26333d,#080b0f 65%);box-shadow:inset 4px 0 #8ee6b2"></span><span><span class="theme-name">Carbon</span><span class="theme-desc">Original graphite + mint</span></span></button>
+          <button class="theme-choice" type="button" data-theme-choice="ocean" aria-pressed="false"><span class="theme-swatch" style="background:linear-gradient(135deg,#164052,#07131a 65%);box-shadow:inset 4px 0 #86d8e8"></span><span><span class="theme-name">Ocean</span><span class="theme-desc">Deep blue + ice</span></span></button>
+          <button class="theme-choice" type="button" data-theme-choice="forest" aria-pressed="false"><span class="theme-swatch" style="background:linear-gradient(135deg,#29442f,#0a120e 65%);box-shadow:inset 4px 0 #a6dfa0"></span><span><span class="theme-name">Forest</span><span class="theme-desc">Dark green + sage</span></span></button>
+          <button class="theme-choice" type="button" data-theme-choice="amber" aria-pressed="false"><span class="theme-swatch" style="background:linear-gradient(135deg,#55402a,#15100a 65%);box-shadow:inset 4px 0 #e8bf7b"></span><span><span class="theme-name">Amber</span><span class="theme-desc">Warm graphite + gold</span></span></button>
+          <button class="theme-choice" type="button" data-theme-choice="mono" aria-pressed="false"><span class="theme-swatch" style="background:linear-gradient(135deg,#444,#090909 65%);box-shadow:inset 4px 0 #e6e6e6"></span><span><span class="theme-name">Monochrome</span><span class="theme-desc">Black + white</span></span></button>
+        </div>
+        <div class="kicker" style="margin:18px 0 8px">Custom background</div>
+        <p class="panel-intro" style="margin-bottom:10px">Choose a photo from your device. DeskOS compresses it for the dashboard before saving it. When signed in, it syncs to your other DeskOS devices.</p>
+        <input class="file-picker" type="file" id="wallpaperFile" accept="image/*">
+        <div class="appearance-actions">
+          <button class="add-button" id="chooseWallpaper" type="button">CHOOSE MY IMAGE</button>
+          <button class="outline-action" id="clearWallpaper" type="button">REMOVE IMAGE</button>
+        </div>
+        <div class="appearance-status" id="appearanceStatus" role="status" aria-live="polite">No custom background selected.</div>
+      </section>
+
+      <section class="panel" id="panel-spotify" hidden>
+        <p class="panel-intro">Browse the complete playlist in this larger player. Spotify recommends a 352px-high embed for playlist track lists. Scroll inside the Spotify player to find songs.</p>
+        <div class="spotify-full-wrap">
+          <iframe title="Full Spotify playlist" src="https://open.spotify.com/embed/playlist/6zxUmMeCZCIXabCkpZ4IxF?utm_source=generator&si=889f308c663f4a40" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+        <div class="spotify-connect-box">
+          <div class="kicker">Spotify Connect · Cross-device playback status</div>
+          <p class="panel-intro" style="margin:7px 0 10px">Connect both DeskOS devices to the same Spotify account. DeskOS can then display the track playing on your PC and send playback controls to that Spotify device. This uses Spotify Connect, so the audio plays on the selected Spotify device—not simultaneously from both devices.</p>
+          <label class="panel-intro" for="spotifyClientIdInput">Spotify Developer App · Client ID</label>
+          <div class="spotify-client-row"><input id="spotifyClientIdInput" type="text" placeholder="Paste Spotify Client ID" autocomplete="off"><button class="outline-action" id="saveSpotifyClientId" type="button">SAVE ID</button></div>
+          <div class="panel-footnote">Add this exact address to your Spotify app's Redirect URIs:</div>
+          <div class="redirect-uri" id="spotifyRedirectUri">Loading redirect address…</div>
+          <div class="appearance-actions">
+            <button class="add-button" id="connectSpotifyButton" type="button">CONNECT SPOTIFY</button>
+            <button class="outline-action" id="disconnectSpotifyButton" type="button" hidden>DISCONNECT</button>
+            <button class="outline-action" id="refreshSpotifyButton" type="button">REFRESH STATUS</button>
+          </div>
+          <div class="spotify-connect-status" id="spotifyConnectStatus" role="status" aria-live="polite">Not connected. A Spotify Developer Client ID is needed.</div>
+          <div id="spotifyMirrorArea" hidden>
+            <div class="spotify-track-state">
+              <img id="spotifyTrackImage" alt="Album artwork" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=">
+              <div class="spotify-track-meta"><div class="spotify-track-title" id="spotifyTrackTitle">Nothing playing</div><div class="spotify-track-artist" id="spotifyTrackArtist">Open Spotify on your PC and start a song.</div><div class="spotify-track-device" id="spotifyTrackDevice"></div></div>
+            </div>
+            <div class="spotify-controls">
+              <button type="button" id="spotifyPreviousButton">PREVIOUS</button>
+              <button type="button" id="spotifyPlayPauseButton">PLAY / PAUSE</button>
+              <button type="button" id="spotifyNextButton">NEXT</button>
+            </div>
+            <div class="panel-footnote">Playback status refreshes periodically. Use the Spotify app's device picker to choose your HP Victus as the playback device.</div>
+          </div>
+        </div>
+        <div class="spotify-footnote">Full-song playback inside Spotify embeds depends on browser encrypted-media support and Spotify's player availability. If Safari on your older iPhone only offers previews, open the playlist in the Spotify app. Spotify Connect mirroring is separate from the embedded preview player.</div>
       </section>
     </div>
   </section>
@@ -617,14 +706,201 @@ button{cursor:pointer}
   // Keep the selected city in the same private per-user branch as tasks.
   if(firebaseReady&&auth)auth.onAuthStateChanged(function(user){startWeatherSync(user);});
 
+  // Appearance settings: theme and compressed wallpaper sync through the signed-in Firebase user.
+  var appearanceStatus=document.getElementById('appearanceStatus');
+  var allowedThemes=['carbon','ocean','forest','amber','mono'];
+  var selectedTheme='carbon';
+  var themeRef=null,themeListener=null,wallpaperRef=null,wallpaperListener=null;
+  var appearanceSeeded=false,wallpaperSeeded=false;
+  function setAppearanceStatus(message){if(appearanceStatus)appearanceStatus.textContent=message;}
+  function applyTheme(theme,writeCloud){
+    if(allowedThemes.indexOf(theme)<0)theme='carbon';
+    selectedTheme=theme;document.body.setAttribute('data-theme',theme);
+    try{localStorage.setItem('deskos-theme-v1',theme);}catch(e){}
+    document.querySelectorAll('[data-theme-choice]').forEach(function(button){button.setAttribute('aria-pressed',button.getAttribute('data-theme-choice')===theme?'true':'false');});
+    if(writeCloud&&currentUser&&themeRef){themeRef.set(theme).catch(function(e){setAppearanceStatus('Theme could not sync: '+firebaseErrorMessage(e));});}
+  }
+  function applyWallpaper(dataUrl){
+    if(typeof dataUrl==='string'&&dataUrl.indexOf('data:image/')===0){
+      document.body.classList.add('has-wallpaper');
+      document.body.style.setProperty('--deskos-wallpaper','url("'+dataUrl+'")');
+      try{localStorage.setItem('deskos-wallpaper-v1',dataUrl);}catch(e){setAppearanceStatus('Image applied, but this browser could not save it locally.');}
+      setAppearanceStatus(currentUser?'Custom background active · syncing to your DeskOS devices.':'Custom background active on this device. Sign in to sync it.');
+    }else{
+      document.body.classList.remove('has-wallpaper');document.body.style.removeProperty('--deskos-wallpaper');
+      try{localStorage.removeItem('deskos-wallpaper-v1');}catch(e){}
+      setAppearanceStatus('Custom background removed.');
+    }
+  }
+  try{var savedTheme=localStorage.getItem('deskos-theme-v1');if(savedTheme)applyTheme(savedTheme,false);var savedWallpaper=localStorage.getItem('deskos-wallpaper-v1');if(savedWallpaper)applyWallpaper(savedWallpaper);}catch(e){}
+  document.querySelectorAll('[data-theme-choice]').forEach(function(button){button.addEventListener('click',function(){applyTheme(button.getAttribute('data-theme-choice'),true);setAppearanceStatus('Theme selected'+(currentUser?' · syncing to your other device.':' on this device.'));});});
+  document.getElementById('chooseWallpaper').addEventListener('click',function(){document.getElementById('wallpaperFile').click();});
+  document.getElementById('wallpaperFile').addEventListener('change',function(event){
+    var file=event.target.files&&event.target.files[0];if(!file)return;
+    if(!file.type||file.type.indexOf('image/')!==0){setAppearanceStatus('Please choose an image file.');return;}
+    setAppearanceStatus('Preparing your image…');
+    var reader=new FileReader();reader.onload=function(){
+      var image=new Image();image.onload=function(){
+        try{
+          var max=1280,scale=Math.min(1,max/Math.max(image.width,image.height));
+          var canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));
+          var ctx=canvas.getContext('2d');ctx.drawImage(image,0,0,canvas.width,canvas.height);
+          var dataUrl=canvas.toDataURL('image/jpeg',0.68);
+          if(dataUrl.length>420000)dataUrl=canvas.toDataURL('image/jpeg',0.48);
+          if(dataUrl.length>480000){setAppearanceStatus('This image is too large after compression. Try a smaller photo.');return;}
+          applyWallpaper(dataUrl);
+          if(currentUser&&wallpaperRef){wallpaperRef.set(dataUrl).then(function(){setAppearanceStatus('Background saved and synced to your DeskOS account.');}).catch(function(err){setAppearanceStatus('Saved on this device, but cloud sync failed: '+firebaseErrorMessage(err));});}
+          else setAppearanceStatus('Background saved on this device. Sign in to sync it to your other device.');
+        }catch(err){setAppearanceStatus('Could not prepare this image. Try another photo.');}
+      };image.onerror=function(){setAppearanceStatus('The selected image could not be opened.');};image.src=reader.result;
+    };reader.onerror=function(){setAppearanceStatus('Could not read that image.');};reader.readAsDataURL(file);event.target.value='';
+  });
+  document.getElementById('clearWallpaper').addEventListener('click',function(){
+    applyWallpaper('');
+    if(currentUser&&wallpaperRef)wallpaperRef.set(null).then(function(){setAppearanceStatus('Custom background removed from all signed-in DeskOS devices.');}).catch(function(e){setAppearanceStatus('Removed locally, but cloud update failed: '+firebaseErrorMessage(e));});
+  });
+  function detachAppearanceSync(){
+    if(themeRef&&themeListener)themeRef.off('value',themeListener);
+    if(wallpaperRef&&wallpaperListener)wallpaperRef.off('value',wallpaperListener);
+    themeRef=null;themeListener=null;wallpaperRef=null;wallpaperListener=null;appearanceSeeded=false;wallpaperSeeded=false;
+  }
+  function startAppearanceSync(user){
+    detachAppearanceSync();if(!user)return;
+    themeRef=firebase.database().ref('users/'+user.uid+'/settings/theme');
+    wallpaperRef=firebase.database().ref('users/'+user.uid+'/settings/wallpaperDataUrl');
+    themeListener=function(snapshot){
+      var cloudTheme=snapshot.val();
+      if(typeof cloudTheme==='string'&&allowedThemes.indexOf(cloudTheme)>=0){applyTheme(cloudTheme,false);}
+      else if(!appearanceSeeded){appearanceSeeded=true;themeRef.transaction(function(current){return (typeof current==='string'&&allowedThemes.indexOf(current)>=0)?current:selectedTheme;});}
+    };
+    wallpaperListener=function(snapshot){
+      if(snapshot.exists()){
+        var cloudImage=snapshot.val();if(typeof cloudImage==='string'&&cloudImage.indexOf('data:image/')===0)applyWallpaper(cloudImage);else if(cloudImage===null)applyWallpaper('');
+        wallpaperSeeded=true;
+      }else if(!wallpaperSeeded){
+        wallpaperSeeded=true;var localImage='';try{localImage=localStorage.getItem('deskos-wallpaper-v1')||'';}catch(e){}
+        if(localImage)wallpaperRef.set(localImage);else applyWallpaper('');
+      }else{applyWallpaper('');}
+    };
+    themeRef.on('value',themeListener,function(error){setAppearanceStatus('Theme sync failed: '+firebaseErrorMessage(error));});
+    wallpaperRef.on('value',wallpaperListener,function(error){setAppearanceStatus('Wallpaper sync failed: '+firebaseErrorMessage(error));});
+  }
+  if(firebaseReady&&auth)auth.onAuthStateChanged(function(user){startAppearanceSync(user);});
+
+  // Spotify Connect uses Spotify OAuth Authorization Code with PKCE; no client secret is stored in the page.
+  var spotifyClientInput=document.getElementById('spotifyClientIdInput');
+  var spotifyStatusEl=document.getElementById('spotifyConnectStatus');
+  var spotifyMirrorArea=document.getElementById('spotifyMirrorArea');
+  var spotifyToken=null,spotifyExpiry=0,spotifyRefresh=null,spotifyLastState=null,spotifyPollTimer=null,spotifyProgressTimer=null;
+  var spotifyRedirectUri=window.location.origin+window.location.pathname;
+  document.getElementById('spotifyRedirectUri').textContent=spotifyRedirectUri;
+  try{spotifyClientInput.value=localStorage.getItem('deskos-spotify-client-id')||'';spotifyToken=localStorage.getItem('deskos-spotify-access-token')||'';spotifyRefresh=localStorage.getItem('deskos-spotify-refresh-token')||'';spotifyExpiry=Number(localStorage.getItem('deskos-spotify-expiry')||0);}catch(e){}
+  function spotifyMessage(message,error){spotifyStatusEl.textContent=message;spotifyStatusEl.style.color=error?'var(--danger)':'var(--muted)';}
+  function saveSpotifyTokens(tokenData){
+    spotifyToken=tokenData.access_token||spotifyToken;spotifyRefresh=tokenData.refresh_token||spotifyRefresh;
+    spotifyExpiry=Date.now()+(Number(tokenData.expires_in)||3600)*1000;
+    try{localStorage.setItem('deskos-spotify-access-token',spotifyToken);if(spotifyRefresh)localStorage.setItem('deskos-spotify-refresh-token',spotifyRefresh);localStorage.setItem('deskos-spotify-expiry',String(spotifyExpiry));}catch(e){}
+  }
+  function spotifyClientId(){return (localStorage.getItem('deskos-spotify-client-id')||spotifyClientInput.value||'').trim();}
+  function randomVerifier(){var bytes=new Uint8Array(64);crypto.getRandomValues(bytes);return Array.from(bytes).map(function(b){return ('0'+b.toString(16)).slice(-2);}).join('');}
+  function base64Url(buffer){var bytes=new Uint8Array(buffer),binary='';for(var i=0;i<bytes.length;i++)binary+=String.fromCharCode(bytes[i]);return btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+  function beginSpotifyAuth(){
+    var clientId=(spotifyClientInput.value||spotifyClientId()).trim();if(!clientId){spotifyMessage('Paste and save your Spotify Developer Client ID first.',true);return;}
+    try{localStorage.setItem('deskos-spotify-client-id',clientId);}catch(e){}
+    if(!window.crypto||!crypto.subtle){spotifyMessage('Secure PKCE sign-in is not available in this browser. Open DeskOS over HTTPS in a supported browser.',true);return;}
+    var verifier=randomVerifier(),state=randomVerifier().slice(0,32);
+    crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier)).then(function(challengeBytes){
+      sessionStorage.setItem('deskos-spotify-pkce-verifier',verifier);sessionStorage.setItem('deskos-spotify-oauth-state',state);
+      var params=new URLSearchParams({client_id:clientId,response_type:'code',redirect_uri:spotifyRedirectUri,code_challenge_method:'S256',code_challenge:base64Url(challengeBytes),state:state,scope:'user-read-playback-state user-modify-playback-state'});
+      window.location.href='https://accounts.spotify.com/authorize?'+params.toString();
+    }).catch(function(){spotifyMessage('Could not start Spotify secure sign-in.',true);});
+  }
+  function spotifyTokenRequest(values){return fetch('https://accounts.spotify.com/api/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(values)}).then(function(r){return r.json().then(function(data){if(!r.ok)throw new Error(data.error_description||data.error||'Spotify token request failed ('+r.status+').');return data;});});}
+  function finishSpotifyAuth(){
+    var params=new URLSearchParams(window.location.search),code=params.get('code'),state=params.get('state');if(!code)return;
+    var savedState=sessionStorage.getItem('deskos-spotify-oauth-state'),verifier=sessionStorage.getItem('deskos-spotify-pkce-verifier');
+    history.replaceState({},document.title,spotifyRedirectUri);
+    if(!state||state!==savedState||!verifier){spotifyMessage('Spotify sign-in state did not match. Please connect again.',true);return;}
+    sessionStorage.removeItem('deskos-spotify-oauth-state');sessionStorage.removeItem('deskos-spotify-pkce-verifier');
+    spotifyMessage('Finishing Spotify sign-in…',false);
+    spotifyTokenRequest({client_id:spotifyClientId(),grant_type:'authorization_code',code:code,redirect_uri:spotifyRedirectUri,code_verifier:verifier}).then(function(data){saveSpotifyTokens(data);spotifyMessage('Spotify connected. Reading your current playback…',false);startSpotifyPolling();}).catch(function(err){spotifyMessage(err.message,true);});
+  }
+  function refreshSpotifyToken(){
+    if(!spotifyRefresh)return Promise.reject(new Error('Spotify session expired. Connect Spotify again.'));
+    return spotifyTokenRequest({client_id:spotifyClientId(),grant_type:'refresh_token',refresh_token:spotifyRefresh}).then(function(data){saveSpotifyTokens(data);return spotifyToken;});
+  }
+  function getSpotifyToken(){
+    if(!spotifyToken)return Promise.reject(new Error('Connect Spotify to continue.'));
+    if(Date.now()<spotifyExpiry-60000)return Promise.resolve(spotifyToken);
+    return refreshSpotifyToken();
+  }
+  function spotifyApi(path,method,body){
+    return getSpotifyToken().then(function(token){
+      var options={method:method||'GET',headers:{Authorization:'Bearer '+token}};
+      if(body!==undefined){options.headers['Content-Type']='application/json';options.body=JSON.stringify(body);}
+      return fetch('https://api.spotify.com/v1'+path,options).then(function(response){
+        if(response.status===204)return null;
+        if(response.status===401)throw new Error('Spotify session expired. Disconnect and connect Spotify again.');
+        if(!response.ok)return response.json().catch(function(){return {};}).then(function(data){throw new Error((data.error&&data.error.message)||'Spotify API error ('+response.status+').');});
+        return response.json().catch(function(){return null;});
+      });
+    });
+  }
+  function displaySpotifyState(state){
+    spotifyLastState=state;spotifyMirrorArea.hidden=false;
+    var track=state&&state.item;
+    if(!track){document.getElementById('spotifyTrackTitle').textContent='Nothing playing';document.getElementById('spotifyTrackArtist').textContent='Start playback in Spotify on your PC.';document.getElementById('spotifyTrackDevice').textContent='No active track';document.getElementById('spotifyTrackImage').removeAttribute('src');document.getElementById('spotifyDashboardStatus').textContent='Spotify connected · No active track';return;}
+    document.getElementById('spotifyTrackTitle').textContent=track.name||'Unknown track';
+    document.getElementById('spotifyTrackArtist').textContent=(track.artists||[]).map(function(a){return a.name;}).join(', ')||'Unknown artist';
+    document.getElementById('spotifyTrackDevice').textContent=(state.is_playing?'PLAYING':'PAUSED')+' · '+(state.device&&state.device.name||'Spotify device');
+    var image=track.album&&track.album.images&&track.album.images.length?track.album.images[0].url:'';if(image)document.getElementById('spotifyTrackImage').src=image;
+    document.getElementById('spotifyPlayPauseButton').textContent=state.is_playing?'PAUSE':'PLAY';
+    document.getElementById('spotifyDashboardStatus').textContent=(state.is_playing?'PLAYING · ':'PAUSED · ')+(track.name||'Spotify track');
+  }
+  function pollSpotifyPlayback(){
+    if(!spotifyToken)return;
+    spotifyApi('/me/player','GET').then(function(state){
+      displaySpotifyState(state);
+      if(state&&state.device&&state.device.name)spotifyMessage('Connected · '+(state.is_playing?'Playing':'Paused')+' on '+state.device.name,false);
+      else spotifyMessage('Spotify connected · Start music on your PC to mirror it here.',false);
+    }).catch(function(err){spotifyMessage(err.message,true);});
+  }
+  function startSpotifyPolling(){
+    if(spotifyPollTimer)clearInterval(spotifyPollTimer);if(spotifyProgressTimer)clearInterval(spotifyProgressTimer);
+    if(spotifyToken){document.getElementById('disconnectSpotifyButton').hidden=false;spotifyMirrorArea.hidden=false;pollSpotifyPlayback();spotifyPollTimer=setInterval(function(){if(!document.hidden)pollSpotifyPlayback();},12000);}
+  }
+  function spotifyCommand(path,method){
+    var state=spotifyLastState,device=state&&state.device&&state.device.id;var url=path+(device?'?device_id='+encodeURIComponent(device):'');
+    spotifyApi(url,method||'PUT').then(function(){setTimeout(pollSpotifyPlayback,900);}).catch(function(err){spotifyMessage(err.message,true);});
+  }
+  document.getElementById('saveSpotifyClientId').addEventListener('click',function(){
+    var id=spotifyClientInput.value.trim();if(!id){spotifyMessage('Enter the Spotify Client ID.',true);return;}
+    try{localStorage.setItem('deskos-spotify-client-id',id);}catch(e){}
+    spotifyMessage('Client ID saved on this device. Use the same ID on your other DeskOS device.',false);
+  });
+  document.getElementById('connectSpotifyButton').addEventListener('click',beginSpotifyAuth);
+  document.getElementById('disconnectSpotifyButton').addEventListener('click',function(){
+    if(spotifyPollTimer)clearInterval(spotifyPollTimer);spotifyToken='';spotifyRefresh='';spotifyExpiry=0;
+    ['deskos-spotify-access-token','deskos-spotify-refresh-token','deskos-spotify-expiry'].forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});
+    spotifyMirrorArea.hidden=true;document.getElementById('disconnectSpotifyButton').hidden=true;spotifyMessage('Disconnected from Spotify on this device.',false);document.getElementById('spotifyDashboardStatus').textContent='Spotify Connect not linked';
+  });
+  document.getElementById('refreshSpotifyButton').addEventListener('click',pollSpotifyPlayback);
+  document.getElementById('spotifyPreviousButton').addEventListener('click',function(){spotifyCommand('/me/player/previous','POST');});
+  document.getElementById('spotifyNextButton').addEventListener('click',function(){spotifyCommand('/me/player/next','POST');});
+  document.getElementById('spotifyPlayPauseButton').addEventListener('click',function(){if(spotifyLastState&&spotifyLastState.is_playing)spotifyCommand('/me/player/pause','PUT');else spotifyCommand('/me/player/play','PUT');});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden&&spotifyToken)pollSpotifyPlayback();});
+  finishSpotifyAuth();
+  if(spotifyClientId()&&spotifyToken){startSpotifyPolling();}else if(!spotifyClientId()){spotifyMessage('Not connected. Create a Spotify Developer app and paste its Client ID.',false);}
+
   // Small utility windows: only the selected panel is shown; scroll stays inside the window.
   var overlay=document.getElementById('windowOverlay');
   var title=document.getElementById('windowTitle');
   var closeButton=document.getElementById('closeWindow');
-  var panelTitles={tasks:'Task manager',weather:'Weather details',calendar:'Calendar',account:'DeskOS account'};
+  var panelTitles={tasks:'Task manager',weather:'Weather details',calendar:'Calendar',account:'DeskOS account',appearance:'Appearance',spotify:'Music station'};
   function openWindow(name){
     document.querySelectorAll('.panel').forEach(function(panel){panel.hidden=panel.id!=='panel-'+name;});
     title.textContent=panelTitles[name]||'DeskOS';
+    document.querySelector('.window').classList.toggle('spotify-window',name==='spotify');
     overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');
     if(name==='tasks'){setTimeout(function(){document.getElementById('panelTaskInput').focus();},60);}
   }
