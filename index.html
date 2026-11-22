@@ -118,6 +118,19 @@ button{cursor:pointer}
 .calendar-links a{display:flex;align-items:center;justify-content:center;min-height:64px;text-align:center;text-decoration:none;color:var(--text);border:1px solid #34434f;border-radius:10px;background:#0c141b;font-size:11px;font-weight:750;letter-spacing:.5px;padding:10px}
 .calendar-links a:hover{border-color:#6cae8a;color:var(--accent)}
 .panel-footnote{font-size:10px;color:var(--dim);line-height:1.5;margin-top:12px}
+
+.topbar-tools{display:flex;align-items:center;justify-content:flex-end;gap:10px;min-width:0}
+.account-toggle{background:var(--accent-soft);color:var(--accent);border:1px solid #426c56;border-radius:8px;padding:7px 11px;font-size:9px;font-weight:850;letter-spacing:.8px;white-space:nowrap}
+.account-toggle:hover{background:rgba(142,230,178,.18);border-color:#6cae8a}
+.auth-fields{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px}
+.auth-fields input{min-width:0;width:100%;background:#080e14;color:var(--text);border:1px solid #2c3b48;border-radius:8px;padding:11px 12px;font-size:12px;outline:none}
+.auth-fields input:focus{border-color:#6cae8a;box-shadow:0 0 0 2px rgba(142,230,178,.08)}
+.auth-actions{display:flex;gap:9px;flex-wrap:wrap}
+.signed-in-card{border:1px solid var(--line);background:#0a1117;border-radius:12px;padding:15px;margin-bottom:12px}
+.signed-in-email{font-size:14px;color:var(--text);margin-top:7px;overflow-wrap:anywhere}
+.auth-message{font-size:11px;line-height:1.5;color:var(--muted);margin:12px 0 0;min-height:17px}
+.auth-message.error{color:var(--danger)}
+.auth-message.success{color:var(--accent)}
 @media(max-width:820px){
  .app-shell{padding:8px;grid-template-rows:28px minmax(0,1fr) 30px;gap:7px}
  .dashboard{grid-template-columns:minmax(135px,.78fr) minmax(205px,1.12fr) minmax(210px,1.15fr);gap:8px}
@@ -127,7 +140,7 @@ button{cursor:pointer}
  .spotify-frame-wrap{height:clamp(150px,39vh,250px);min-height:135px}.music-subtitle{font-size:9px}.dock button{padding:6px 10px;font-size:8px}
 }
 @media(max-width:600px){
- .system-status{display:none}.brand{font-size:10px;letter-spacing:2px}
+ .system-status{display:none}.brand{font-size:10px;letter-spacing:2px}.topbar-tools{gap:5px}.account-toggle{padding:6px 8px;font-size:8px}
  .dashboard{grid-template-columns:minmax(115px,.74fr) minmax(180px,1.1fr) minmax(185px,1.12fr);gap:6px}
  .left-stack{gap:6px}.card{padding:8px}.kicker{font-size:8px;letter-spacing:1.2px}
  .date{font-size:9px}.time{font-size:clamp(29px,5.8vw,40px);letter-spacing:-1.7px}
@@ -150,6 +163,7 @@ button{cursor:pointer}
  .music-card{grid-column:1;grid-row:2}
  .time{font-size:clamp(24px,8vw,38px)}.spotify-frame-wrap{height:125px;min-height:110px}
  .dock button{padding:5px 7px;font-size:7px}
+ .auth-fields{grid-template-columns:1fr}.auth-actions{display:grid;grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
@@ -157,7 +171,10 @@ button{cursor:pointer}
 <div class="app-shell">
   <header class="topbar">
     <div class="brand"><span class="brand-mark">◈</span>DESKOS <span style="color:#71818e;font-weight:600">/ DEVELOPER MODE</span></div>
-    <div class="system-status">SYSTEM ONLINE&nbsp; · &nbsp;PERSONAL WORKSPACE</div>
+    <div class="topbar-tools">
+      <div class="system-status" id="syncStatus" aria-live="polite">LOCAL MODE · CONNECT TO SYNC</div>
+      <button class="account-toggle" type="button" data-open="account" id="accountToggle">CONNECT ↗</button>
+    </div>
   </header>
 
   <main class="dashboard" aria-label="DeskOS dashboard">
@@ -253,6 +270,29 @@ button{cursor:pointer}
         <div class="panel-footnote">Weather data is provided by Open-Meteo. An internet connection is required.</div>
       </section>
 
+      <section class="panel" id="panel-account" hidden>
+        <p class="panel-intro">Sign in with the same DeskOS account on your PC and iPhone. Your tasks will then stay synchronised between both devices.</p>
+        <div id="accountSignedOut">
+          <div class="auth-fields">
+            <input id="accountEmail" type="email" placeholder="Email address" autocomplete="username" aria-label="Email address">
+            <input id="accountPassword" type="password" placeholder="Password (minimum 6 characters)" autocomplete="current-password" aria-label="Password">
+          </div>
+          <div class="auth-actions">
+            <button class="add-button" id="loginButton" type="button">SIGN IN</button>
+            <button class="outline-action" id="createAccountButton" type="button">CREATE ACCOUNT</button>
+          </div>
+        </div>
+        <div id="accountSignedIn" hidden>
+          <div class="signed-in-card">
+            <div class="kicker">CONNECTED ACCOUNT</div>
+            <div id="accountEmailDisplay" class="signed-in-email"></div>
+            <div class="panel-footnote">Tasks are syncing through your private Firebase account.</div>
+          </div>
+          <button class="outline-action" id="logoutButton" type="button">SIGN OUT</button>
+        </div>
+        <p class="auth-message" id="authMessage" role="status" aria-live="polite">Your email and password stay with Firebase Authentication; do not share them in chat.</p>
+      </section>
+
       <section class="panel" id="panel-calendar" hidden>
         <p class="panel-intro">Open your calendar in the app or web service you already use.</p>
         <div class="calendar-links">
@@ -265,6 +305,9 @@ button{cursor:pointer}
   </section>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script>
 (function(){
   'use strict';
@@ -277,22 +320,86 @@ button{cursor:pointer}
   }
   tick();setInterval(tick,1000);
 
-  // Tasks remain local to this browser for now. Firebase will make them shared between devices later.
-  var tasks=[];
-  try{tasks=JSON.parse(localStorage.getItem('deskos-tasks')||'[]');if(!Array.isArray(tasks))tasks=[];}catch(e){tasks=[];}
+  // Firebase-backed tasks. Local storage remains as an offline cache and one-time migration source.
+  var firebaseConfig = {
+    apiKey: "AIzaSyDo00YVWxLOv4QCAL8-4aDj1de88DZdJLY",
+    authDomain: "deskos-a55c4.firebaseapp.com",
+    databaseURL: "https://deskos-a55c4-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "deskos-a55c4",
+    storageBucket: "deskos-a55c4.firebasestorage.app",
+    messagingSenderId: "400914141297",
+    appId: "1:400914141297:web:7b50e9eaa6981cea098bd0"
+  };
+
   var preview=document.getElementById('taskPreview');
   var allTasks=document.getElementById('allTasks');
   var taskCount=document.getElementById('taskCount');
   var taskSummary=document.getElementById('taskSummary');
-  function saveTasks(){try{localStorage.setItem('deskos-tasks',JSON.stringify(tasks));}catch(e){}}
-  function makeTaskRow(task,index){
-    var li=document.createElement('li');li.className='task-row'+(task.done?' done':'');
-    var check=document.createElement('input');check.type='checkbox';check.className='task-check';check.checked=!!task.done;check.setAttribute('aria-label','Mark task complete');
-    check.addEventListener('change',function(){tasks[index].done=check.checked;saveTasks();renderTasks();});
-    var span=document.createElement('span');span.className='task-text';span.textContent=task.text||'Untitled task';
-    var del=document.createElement('button');del.type='button';del.className='delete-task';del.textContent='×';del.setAttribute('aria-label','Delete task');
-    del.addEventListener('click',function(){tasks.splice(index,1);saveTasks();renderTasks();});
-    li.appendChild(check);li.appendChild(span);li.appendChild(del);return li;
+  var syncStatus=document.getElementById('syncStatus');
+  var accountToggle=document.getElementById('accountToggle');
+  var authMessage=document.getElementById('authMessage');
+  var accountSignedOut=document.getElementById('accountSignedOut');
+  var accountSignedIn=document.getElementById('accountSignedIn');
+  var accountEmailDisplay=document.getElementById('accountEmailDisplay');
+  var accountEmail=document.getElementById('accountEmail');
+  var accountPassword=document.getElementById('accountPassword');
+  var currentUser=null;
+  var tasksRef=null;
+  var tasksListener=null;
+  var syncReady=false;
+  var firebaseReady=false;
+  var tasks=[];
+
+  function readLocalTasks(){
+    try{
+      var parsed=JSON.parse(localStorage.getItem('deskos-tasks')||'[]');
+      if(!Array.isArray(parsed))return [];
+      return parsed.filter(function(t){return t&&typeof t==='object'&&String(t.text||'').trim();}).map(function(t,i){
+        return {id:t.id||('local_'+Date.now().toString(36)+'_'+i+'_'+Math.random().toString(36).slice(2,7)),text:String(t.text).slice(0,100),done:!!t.done,createdAt:Number(t.createdAt)||Date.now()-i};
+      });
+    }catch(e){return [];}
+  }
+  function saveLocalTasks(){
+    try{localStorage.setItem('deskos-tasks',JSON.stringify(tasks.map(function(t){return {id:t.id,text:t.text,done:!!t.done,createdAt:t.createdAt||Date.now()};})));}catch(e){}
+  }
+  tasks=readLocalTasks();
+  saveLocalTasks();
+
+  function setSyncStatus(message){if(syncStatus)syncStatus.textContent=message;}
+  function showAuthMessage(message,type){
+    authMessage.textContent=message||'';
+    authMessage.className='auth-message'+(type?' '+type:'');
+  }
+  function firebaseErrorMessage(error){
+    var code=error&&error.code||'';
+    var messages={
+      'auth/invalid-email':'That email address does not look valid.',
+      'auth/user-not-found':'No account found for that email. Create an account first.',
+      'auth/wrong-password':'Incorrect password. Try again.',
+      'auth/invalid-credential':'Email or password is incorrect.',
+      'auth/email-already-in-use':'An account already exists with this email. Sign in instead.',
+      'auth/weak-password':'Choose a password with at least 6 characters.',
+      'auth/too-many-requests':'Too many attempts. Please try again later.',
+      'PERMISSION_DENIED':'Firebase denied database access. Check the Realtime Database rules.'
+    };
+    return messages[code]||((error&&error.message)||'Something went wrong. Check your connection and Firebase setup.');
+  }
+  function stableHash(value){
+    var hash=2166136261;
+    for(var i=0;i<value.length;i++){hash^=value.charCodeAt(i);hash=Math.imul(hash,16777619);}
+    return (hash>>>0).toString(36);
+  }
+  function makeLegacyImport(localTasks){
+    var occurrences={};
+    var updates={};
+    localTasks.forEach(function(task,index){
+      var normalized=String(task.text||'').trim().toLowerCase();
+      var occurrence=occurrences[normalized]||0;
+      occurrences[normalized]=occurrence+1;
+      var key='legacy_'+stableHash(normalized+'|'+occurrence);
+      updates[key]={text:String(task.text).slice(0,100),done:!!task.done,createdAt:Number(task.createdAt)||Date.now()-index,updatedAt:Date.now()};
+    });
+    return updates;
   }
   function renderTasks(){
     preview.innerHTML='';allTasks.innerHTML='';
@@ -304,19 +411,130 @@ button{cursor:pointer}
       var empty=document.createElement('div');empty.className='empty-state';
       empty.textContent=tasks.length?'All caught up. Nice work.':'No tasks yet. Add one above to get started.';preview.appendChild(empty);
     }else{
-      openTasks.slice(0,3).forEach(function(task){preview.appendChild(makeTaskRow(task,tasks.indexOf(task)));});
+      openTasks.slice(0,3).forEach(function(task){preview.appendChild(makeTaskRow(task));});
       if(openTasks.length>3){var more=document.createElement('div');more.className='task-bottom-note';more.style.padding='7px 2px';more.textContent='+'+(openTasks.length-3)+' more in your task list';preview.appendChild(more);}
     }
     if(!tasks.length){var emptyAll=document.createElement('li');emptyAll.className='empty-state';emptyAll.textContent='No tasks yet. Add your first task above.';allTasks.appendChild(emptyAll);}
     else{
-      // Open tasks first, then completed tasks.
-      tasks.map(function(t,i){return {task:t,index:i};}).sort(function(a,b){return Number(!!a.task.done)-Number(!!b.task.done);}).forEach(function(item){allTasks.appendChild(makeTaskRow(item.task,item.index));});
+      tasks.slice().sort(function(a,b){return Number(!!a.done)-Number(!!b.done)||(Number(b.createdAt)||0)-(Number(a.createdAt)||0);}).forEach(function(task){allTasks.appendChild(makeTaskRow(task));});
     }
   }
-  function addTask(input){var value=input.value.trim();if(!value)return;tasks.unshift({text:value,done:false});input.value='';saveTasks();renderTasks();}
+  function makeTaskRow(task){
+    var li=document.createElement('li');li.className='task-row'+(task.done?' done':'');
+    var check=document.createElement('input');check.type='checkbox';check.className='task-check';check.checked=!!task.done;check.setAttribute('aria-label','Mark task complete');
+    check.addEventListener('change',function(){setTaskDone(task.id,check.checked);});
+    var span=document.createElement('span');span.className='task-text';span.textContent=task.text||'Untitled task';
+    var del=document.createElement('button');del.type='button';del.className='delete-task';del.textContent='×';del.setAttribute('aria-label','Delete task');
+    del.addEventListener('click',function(){deleteTask(task.id);});
+    li.appendChild(check);li.appendChild(span);li.appendChild(del);return li;
+  }
+  function addTask(input){
+    var value=input.value.trim();if(!value)return;
+    if(currentUser&&(!tasksRef||!syncReady)){showAuthMessage('Connecting your task list. Please try again in a moment.','');return;}
+    input.value='';
+    if(currentUser&&tasksRef){
+      tasksRef.push({text:value,done:false,createdAt:firebase.database.ServerValue.TIMESTAMP,updatedAt:firebase.database.ServerValue.TIMESTAMP}).catch(function(error){showAuthMessage(firebaseErrorMessage(error),'error');});
+    }else{
+      tasks.unshift({id:'local_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8),text:value,done:false,createdAt:Date.now()});
+      saveLocalTasks();renderTasks();
+    }
+  }
+  function setTaskDone(taskId,done){
+    if(currentUser&&tasksRef){tasksRef.child(taskId).update({done:!!done,updatedAt:firebase.database.ServerValue.TIMESTAMP}).catch(function(error){showAuthMessage(firebaseErrorMessage(error),'error');});return;}
+    var task=tasks.find(function(t){return t.id===taskId;});if(task){task.done=!!done;saveLocalTasks();renderTasks();}
+  }
+  function deleteTask(taskId){
+    if(currentUser&&tasksRef){tasksRef.child(taskId).remove().catch(function(error){showAuthMessage(firebaseErrorMessage(error),'error');});return;}
+    tasks=tasks.filter(function(t){return t.id!==taskId;});saveLocalTasks();renderTasks();
+  }
   document.getElementById('quickTaskForm').addEventListener('submit',function(e){e.preventDefault();addTask(document.getElementById('quickTaskInput'));});
   document.getElementById('panelTaskForm').addEventListener('submit',function(e){e.preventDefault();addTask(document.getElementById('panelTaskInput'));});
   renderTasks();
+
+  function updateAccountUi(user){
+    var signedIn=!!user;
+    accountSignedOut.hidden=signedIn;
+    accountSignedIn.hidden=!signedIn;
+    accountEmailDisplay.textContent=signedIn?user.email:'';
+    accountToggle.textContent=signedIn?'ACCOUNT ✓':'CONNECT ↗';
+  }
+  function detachTaskListener(){
+    if(tasksRef&&tasksListener)tasksRef.off('value',tasksListener);
+    tasksListener=null;tasksRef=null;syncReady=false;
+  }
+  function startTaskSync(user){
+    detachTaskListener();
+    currentUser=user;
+    updateAccountUi(user);
+    if(!user){
+      tasks=readLocalTasks();renderTasks();
+      setSyncStatus('LOCAL MODE · CONNECT TO SYNC');
+      return;
+    }
+    setSyncStatus('CONNECTING · SYNCING TASKS…');
+    showAuthMessage('Signed in. Connecting your task list…','');
+    tasksRef=firebase.database().ref('users/'+user.uid+'/tasks');
+    var migrationKey='deskos-migrated-v1-'+user.uid;
+    var lastUid='';try{lastUid=localStorage.getItem('deskos-last-sync-uid')||'';}catch(e){}
+    var localBeforeSync=readLocalTasks();
+    var canImportLegacy=!lastUid;
+    var alreadyMigrated=false;try{alreadyMigrated=localStorage.getItem(migrationKey)==='1';}catch(e){}
+    var migration=Promise.resolve();
+    if(!alreadyMigrated){
+      var updates=canImportLegacy?makeLegacyImport(localBeforeSync):{};
+      migration=(Object.keys(updates).length?tasksRef.update(updates):Promise.resolve()).then(function(){
+        try{localStorage.setItem(migrationKey,'1');localStorage.setItem('deskos-last-sync-uid',user.uid);}catch(e){}
+      });
+    }else{
+      try{localStorage.setItem('deskos-last-sync-uid',user.uid);}catch(e){}
+    }
+    migration.then(function(){
+      if(!currentUser||currentUser.uid!==user.uid)return;
+      tasksListener=tasksRef.on('value',function(snapshot){
+        var data=snapshot.val()||{};
+        tasks=Object.keys(data).map(function(key){var value=data[key]||{};return {id:key,text:String(value.text||'Untitled task'),done:!!value.done,createdAt:Number(value.createdAt)||0,updatedAt:Number(value.updatedAt)||0};});
+        tasks.sort(function(a,b){return (Number(b.createdAt)||0)-(Number(a.createdAt)||0);});
+        saveLocalTasks();renderTasks();syncReady=true;
+        setSyncStatus('SYNCED · '+(user.email||'ACCOUNT').toUpperCase());
+        showAuthMessage('Your tasks are synchronised. Use this same account on your other device.','success');
+      },function(error){
+        syncReady=false;setSyncStatus('SYNC ERROR · CHECK DATABASE RULES');
+        showAuthMessage(firebaseErrorMessage(error),'error');
+      });
+    }).catch(function(error){
+      syncReady=false;setSyncStatus('SYNC ERROR · CHECK DATABASE RULES');
+      showAuthMessage(firebaseErrorMessage(error),'error');
+    });
+  }
+
+  try{
+    if(typeof firebase==='undefined')throw new Error('Firebase SDK could not load. Check your internet connection.');
+    var firebaseApp=firebase.apps.length?firebase.app():firebase.initializeApp(firebaseConfig);
+    var auth=firebase.auth();
+    firebase.database();
+    firebaseReady=true;
+    auth.onAuthStateChanged(function(user){startTaskSync(user);});
+  }catch(error){
+    setSyncStatus('FIREBASE NOT READY');
+    showAuthMessage(firebaseErrorMessage(error),'error');
+  }
+  document.getElementById('loginButton').addEventListener('click',function(){
+    if(!firebaseReady){showAuthMessage('Firebase could not start. Check the database URL and internet connection.','error');return;}
+    var email=accountEmail.value.trim(),password=accountPassword.value;
+    if(!email||!password){showAuthMessage('Enter your email address and password.','error');return;}
+    showAuthMessage('Signing in…','');
+    firebase.auth().signInWithEmailAndPassword(email,password).then(function(){accountPassword.value='';showAuthMessage('Signed in successfully.','success');}).catch(function(error){showAuthMessage(firebaseErrorMessage(error),'error');});
+  });
+  document.getElementById('createAccountButton').addEventListener('click',function(){
+    if(!firebaseReady){showAuthMessage('Firebase could not start. Check the database URL and internet connection.','error');return;}
+    var email=accountEmail.value.trim(),password=accountPassword.value;
+    if(!email||!password){showAuthMessage('Enter an email address and a password of at least 6 characters.','error');return;}
+    showAuthMessage('Creating your DeskOS account…','');
+    firebase.auth().createUserWithEmailAndPassword(email,password).then(function(){accountPassword.value='';showAuthMessage('Account created. DeskOS is connecting your tasks.','success');}).catch(function(error){showAuthMessage(firebaseErrorMessage(error),'error');});
+  });
+  document.getElementById('logoutButton').addEventListener('click',function(){
+    firebase.auth().signOut().then(function(){showAuthMessage('Signed out. This device is back in local mode.','');}).catch(function(error){showAuthMessage(firebaseErrorMessage(error),'error');});
+  });
 
   // Weather lookup using Open-Meteo geocoding and forecast APIs.
   var weatherMain=document.getElementById('weatherMain');
@@ -361,7 +579,7 @@ button{cursor:pointer}
   var overlay=document.getElementById('windowOverlay');
   var title=document.getElementById('windowTitle');
   var closeButton=document.getElementById('closeWindow');
-  var panelTitles={tasks:'Task manager',weather:'Weather details',calendar:'Calendar'};
+  var panelTitles={tasks:'Task manager',weather:'Weather details',calendar:'Calendar',account:'DeskOS account'};
   function openWindow(name){
     document.querySelectorAll('.panel').forEach(function(panel){panel.hidden=panel.id!=='panel-'+name;});
     title.textContent=panelTitles[name]||'DeskOS';
